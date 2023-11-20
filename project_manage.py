@@ -91,8 +91,8 @@ def initializing():
     # add the 'login' table into the database
     db.add_table(login_table)
 
-    for i in login_member:
-        print(i)
+    # for i in login_member:
+    #     print(i)
 
 
 # define a funcion called login
@@ -122,7 +122,6 @@ def login():
 
 # here are things to do in this function:
 # add code that performs a login task
-# ask a user for a username and password
 
 
 # make calls to the initializing and login functions defined above
