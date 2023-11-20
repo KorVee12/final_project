@@ -51,6 +51,9 @@ class Table:
 
             self.__list_dict.append(row)
 
+    def get_row(self):
+        return self.__list_dict
+
     def __repr__(self) -> str:
         return f"Tables {self.name}"
 
