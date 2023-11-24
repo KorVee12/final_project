@@ -165,10 +165,6 @@ def random_string(length):
 def change_role(login_member):
     for i in login_member:
 
-        # let the initial role of all the students be Member
-        if i["role"] == "student":
-            i["role"] = "member"
-
         # let the initial role of all the faculties be Faculty
         if i["role"] == "faculty":
             i["role"] = "faculty"

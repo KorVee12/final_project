@@ -83,10 +83,6 @@ def initializing():
     def change_role(login_member):
         for i in login_member:
 
-            # let the initial role of all the students be Member
-            if i["role"] == "student":
-                i["role"] = "member"
-
             # let the initial role of all the faculties be Faculty
             if i["role"] == "faculty":
                 i["role"] = "faculty"
@@ -176,24 +172,49 @@ def login():
 # make calls to the initializing and login functions defined above
 
 initializing()
-print(login_table.get_row())
-val = login()
-
-print(val)
-
+# val = login()
+# 4788888,Thiago.T,sa4a,member
+# 4720327,David.D,vm0y,faculty
+val = ["4788888", "member"]
 # END part 1
 
 # CONTINUE to part 2 (to be done for the next due date)
 
 # based on the return value for login, activate the code that performs activities according to the role defined for that person_id
 
-# if val[1] = 'admin':
-# do admin related activities
-# elif val[1] = 'advisor':
-# do advisor related activities
-# elif val[1] = 'lead':
-# do lead related activities
-# elif val[1] = 'member':
-# do member related activities
-# elif val[1] = 'faculty':
-# do faculty related activities
+
+class ProcessMember:
+    def __init__(self, val):
+        self.__data_member = val
+
+    # ! Yet not complete !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    def check_request_project(self) -> bool:
+        self.__data_member
+        return False
+
+    def select_action(self):
+        print("Menu for member".center(30, "-"))
+        print("1. View projects")
+        print("2. Create projects")
+        requested = self.check_request_project()
+        # number_choice = input("Select choice: ")
+        number_choice = "2"
+        if number_choice == "1":
+            print("View projects")
+        elif number_choice == "2":
+            if not requested:
+                print("Create projects")
+            else:
+                print("You have already requested")
+
+
+if val[1] == "admin":
+    pass
+elif val[1] == "advisor":
+    pass
+elif val[1] == "lead":
+    pass
+elif val[1] == "member":
+    ProcessMember(val).select_action()
+elif val[1] == "faculty":
+    pass
