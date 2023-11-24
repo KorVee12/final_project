@@ -140,8 +140,13 @@ class Table:
 
             self.__list_dict.append(row)
 
-    def get_row(self):
-        return self.__list_dict
+    def get_data_one(self, id: str, field_id: str, db_object):
+        return get_read_csv(
+            filename=f"{db_object.name}/{self.name}.csv", id=id, field_id=field_id
+        )
+
+    def get_row(self, db_object):
+        return query_read_csv(filename=f"{db_object.name}/{self.name}.csv")
 
     def __repr__(self) -> str:
         return f"Tables {self.name}"

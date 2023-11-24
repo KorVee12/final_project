@@ -6,6 +6,7 @@ import copy
 import random
 import string
 import os
+import uuid
 
 # initialize the database
 db = Database("project_manage_db")
@@ -195,6 +196,26 @@ class ProcessMember:
         self.__data_member
         return False
 
+    def create_project(self):
+        title = input("Enter title Project: ")
+        data = login_table.get_data_one(val[0], "person_id", db)
+        # member 1 and member 2 and advisor will for loop show data all of select
+        project_table.add_row(
+            [
+                uuid.uuid4(),
+                title,
+                data["username"],
+                "member1",
+                "member2",
+                "advisor",
+                "pedding_member",
+            ]
+        )
+
+        # self.__data_member
+
+        # send request to students from data login table
+
     def select_action(self):
         print("Menu for member".center(30, "-"))
         print("1. View projects")
@@ -206,7 +227,13 @@ class ProcessMember:
             print("View projects")
         elif number_choice == "2":
             if not requested:
-                print("Create projects")
+
+                # ? create project
+                self.create_project()
+
+                # ? change role to lead at login table for this member
+                # self.change_role_lead_login()
+
             else:
                 print("You have already requested")
 
