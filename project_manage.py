@@ -5,8 +5,17 @@ from database import Database, Table, get_persons
 import copy
 import random
 import string
+import os
 
-db = Database("project_manage")
+# initialize the database
+db = Database("project_manage_db")
+
+# initialize the tables
+persons_table = Table("persons")
+login_table = Table("login")
+project_table = Table("project")
+advisor_pending_request_table = Table("advisor_pending_request")
+member_pending_request_table = Table("member_pending_request")
 buff_seed = 1
 # define a funcion called initializing
 
@@ -21,16 +30,16 @@ def initializing():
     persons = Persons().persons
 
     # create a 'persons' table
-    persons_table = Table("persons")
     persons_table.add_fields(["ID", "fist", "last", "type"])
     persons_table.add_row(persons)
 
     # add the 'persons' table into the database
-    db.add_table(persons_table)
+    db.create_table(persons_table)
+
+    if f"{persons_table.name}.csv" not in os.listdir(db.name):
+        db.add_row_table(persons_table)
 
     # create a 'login' table
-    login_table = Table("login")
-
     # the 'login' table has the following keys (attributes):
     # person_id
     # username
@@ -89,10 +98,50 @@ def initializing():
     login_table.add_row(login_member)
 
     # add the 'login' table into the database
-    db.add_table(login_table)
+    db.create_table(login_table)
+    if f"{login_table.name}.csv" not in os.listdir(db.name):
+        db.add_row_table(login_table)
 
-    # for i in login_member:
-    #     print(i)
+    # create a 'project' table
+    project_table.add_fields(
+        [
+            "project_id",
+            "title",
+            "lead",
+            "member1",
+            "member2",
+            "advisor",
+            "status",
+        ]
+    )
+    # add the 'project' table into the database
+    db.create_table(project_table)
+
+    # create a 'advisor_pending_request' table
+    advisor_pending_request_table.add_fields(
+        [
+            "project_id",
+            "to_be_advisor",
+            "response",
+            "response_date",
+        ]
+    )
+
+    # add the 'advisor_pending_request' table into the database
+    db.create_table(advisor_pending_request_table)
+
+    # create a 'member_pending_request' table
+    member_pending_request_table.add_fields(
+        [
+            "project_id",
+            "to_be_member",
+            "response",
+            "response_date",
+        ]
+    )
+
+    # add the 'member_pending_request' table into the database
+    db.create_table(member_pending_request_table)
 
 
 # define a funcion called login
@@ -127,9 +176,10 @@ def login():
 # make calls to the initializing and login functions defined above
 
 initializing()
+print(login_table.get_row())
 val = login()
 
-# print(val)
+print(val)
 
 # END part 1
 
