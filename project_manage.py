@@ -83,6 +83,9 @@ def initializing():
     def change_role(login_member):
         for i in login_member:
 
+            if i["role"] == "student":
+                i["role"] = "student"
+
             # let the initial role of all the faculties be Faculty
             if i["role"] == "faculty":
                 i["role"] = "faculty"
