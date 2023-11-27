@@ -104,8 +104,10 @@ class Database:
         self.tables.append(table_object)
 
     def add_row_table(self, table_object: object):
-        if table_object.get_row() != []:
-            for i in table_object.get_row():
+
+        data = table_object.get_row()
+        if data != []:
+            for i in data:
                 insert_csv(
                     filename=f"{self.name}/{table_object.name}.csv",
                     fieldname=table_object.get_fields(),
@@ -145,8 +147,29 @@ class Table:
             filename=f"{db_object.name}/{self.name}.csv", id=id, field_id=field_id
         )
 
-    def get_row(self, db_object):
-        return query_read_csv(filename=f"{db_object.name}/{self.name}.csv")
+    def add_data_one(self, fieldname: list, row_data: dict, db_object):
+        return insert_csv(
+            filename=f"{db_object.name}/{self.name}.csv",
+            fieldname=fieldname,
+            row_data=row_data,
+        )
+
+    def get_row(self):
+        return self.__list_dict
+
+    def query_row(self, db_object_name: str):
+        return query_read_csv(filename=f"{db_object_name}/{self.name}.csv")
+
+    def update_row(
+        self, id: str, field_id: str, dict_data: dict, fieldname: list, db_object
+    ):
+        update_csv(
+            filename=f"{db_object.name}/{self.name}.csv",
+            id=id,
+            field_id=field_id,
+            dict_data=dict_data,
+            fieldname=fieldname,
+        )
 
     def __repr__(self) -> str:
         return f"Tables {self.name}"
