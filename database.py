@@ -171,6 +171,14 @@ class Table:
             fieldname=fieldname,
         )
 
+    def delete_row(self, id: str, field_id: str, fieldname: list, db_object):
+        delete_csv(
+            filename=f"{db_object.name}/{self.name}.csv",
+            id=id,
+            field_id=field_id,
+            fieldname=fieldname,
+        )
+
     def __repr__(self) -> str:
         return f"Tables {self.name}"
 

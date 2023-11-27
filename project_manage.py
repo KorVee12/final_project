@@ -147,16 +147,18 @@ def initializing():
 # define a funcion called login
 
 
-def login():
-    while True:
-        username = input("Enter username: ")
-        if username:
-            break
+def login(username=None, password=None):
+    if username is None:
+        while True:
+            username = input("Enter username: ")
+            if username:
+                break
 
-    while True:
-        password = input("Enter password: ")
-        if password:
-            break
+    if password is None:
+        while True:
+            password = input("Enter password: ")
+            if password:
+                break
 
     users = db.get_tables()[1].query_row(db.name)
 
@@ -177,9 +179,12 @@ def login():
 
 initializing()
 # val = login()
+val = login("Hugo.H", "3oz5")
+# print(val)
 # 4788888,Thiago.T,sa4a,member
 # 4720327,David.D,vm0y,faculty
-val = ["4788888", "member"]
+# 1228464,Hugo.H,3oz5,student
+# val = ["4788888", "member"]
 # END part 1
 
 # CONTINUE to part 2 (to be done for the next due date)
@@ -215,7 +220,6 @@ class ProcessMember:
         data = login_table.query_row(db.name)
         count = 0
         print(f"Select {name}".center(30, "-"))
-        print(data)
         for i in data:
             if i["role"] == "student":
                 count += 1
@@ -230,7 +234,7 @@ class ProcessMember:
                         self.change_role("member", i)
                         self.send_request("member", i)
                         print(f"Invite {i['username']} to {name} success")
-                        return i["username"]
+                        return i["person_id"]
         else:
             return None
 
@@ -252,7 +256,7 @@ class ProcessMember:
                         self.change_role("advisor", i)
                         self.send_request("advisor", i)
                         print(f"Invite {i['username']} to {name} success")
-                        return i["username"]
+                        return i["person_id"]
         else:
             return None
 
@@ -260,7 +264,7 @@ class ProcessMember:
         if role_name == "member":
             data = {
                 "project_id": self.project_id,
-                "to_be_member": data_user["username"],
+                "to_be_member": data_user["person_id"],
                 "response": None,
                 "response_date": None,
             }
@@ -271,7 +275,7 @@ class ProcessMember:
         elif role_name == "advisor":
             data = {
                 "project_id": self.project_id,
-                "to_be_advisor": data_user["username"],
+                "to_be_advisor": data_user["person_id"],
                 "response": None,
                 "response_date": None,
             }
@@ -290,7 +294,7 @@ class ProcessMember:
                 {
                     "project_id": self.project_id,
                     "title": title,
-                    "lead": data["username"],
+                    "lead": data["person_id"],
                     "member1": self.invite_member("member 1"),
                     "member2": self.invite_member("member 2"),
                     "advisor": self.invite_advisor("advisor"),
@@ -298,27 +302,144 @@ class ProcessMember:
                 }
             ]
         )
+        data = login_table.get_data_one(val[0], "person_id", db)
+        self.change_role("lead", data)
+        self.__data_member = [data["person_id"], data["role"]]
         db.add_row_table(project_table)
 
         # send request to students from data login table
 
+    def view_project(self):
+        while True:
+            print(" View project ".center(30, "-"))
+            data = project_table.query_row(db.name)
+            for i in data:
+                if i["lead"] == self.__data_member[0]:
+                    for k, v in i.items():
+                        if (
+                            k == "lead"
+                            or k == "member1"
+                            or k == "member2"
+                            or k == "advisor"
+                        ):
+                            v = login_table.get_data_one(v, "person_id", db)["username"]
+                        if k == "status":
+                            if v == "pendding_member":
+                                v = "Pendding..."
+                            elif v == "accept_member":
+                                v = "Accept"
+                            elif v == "reject_member":
+                                v = "Reject"
+
+                        print(f"{k} : {v}")
+            print("--------------".center(30, "-"))
+            print("")
+            print("1. Back to menu ⬅️")
+            print("0. Exit Program ❌")
+            number_choice = input("Select choice: ")
+            if number_choice == "1":
+                break
+            elif number_choice == "0":
+                exit()
+
+    def back_to_basic(self, person_id, new_role):
+        data = login_table.query_row(db.name)
+        for i in data:
+            if i["person_id"] == person_id:
+                self.change_role(new_role, i)
+                break
+
+    def update_project(self) -> dict:
+        data = project_table.query_row(db.name)
+        for i in data:
+            if i["lead"] == self.__data_member[0]:
+                for k, v in i.items():
+                    if k == "project_id":
+                        project_id = v
+                    elif k == "title":
+                        title_new = input(f"Enter new title (origin is {v}): ")
+                    elif k == "lead":
+                        lead = v
+                    elif k == "member1":
+                        member1_new = self.invite_member("member 1")
+                        self.back_to_basic(v, "student")
+                    elif k == "member2":
+                        member2_new = self.invite_member("member 2")
+                        self.back_to_basic(v, "student")
+                    elif k == "advisor":
+                        advisor_new = self.invite_advisor("advisor")
+                        self.back_to_basic(v, "faculty")
+                    elif k == "status":
+                        status = v
+
+        return {
+            "project_id": project_id,
+            "title": title_new,
+            "lead": lead,
+            "member1": member1_new,
+            "member2": member2_new,
+            "advisor": advisor_new,
+            "status": status,
+        }
+
+    def edit_project(self):
+        print("Edit project".center(30, "-"))
+        data = project_table.query_row(db.name)
+        for i in data:
+            if i["lead"] == self.__data_member[0]:
+                # print(self.update_project())
+                project_table.update_row(
+                    id=i["project_id"],
+                    field_id="project_id",
+                    dict_data=self.update_project(),
+                    fieldname=[
+                        "project_id",
+                        "title",
+                        "lead",
+                        "member1",
+                        "member2",
+                        "advisor",
+                        "status",
+                    ],
+                    db_object=db,
+                )
+            break
+        self.view_project()
+
     def select_action(self):
-        print("Menu for member".center(30, "-"))
-        print("1. View projects")
-        print("2. Create projects")
-        requested = self.check_request_project()
-        # number_choice = input("Select choice: ")
-        number_choice = "2"
-        if number_choice == "1":
-            print("View projects")
-        elif number_choice == "2":
-            if not requested:
+        while True:
+            print("Menu for member".center(30, "-"))
+            print("1. View project 📃")
 
-                # ? create project
-                self.create_project()
+            if self.__data_member[1] != "lead" and self.__data_member[1] != "member":
+                print("2. Create project 🪄")
 
-            else:
-                print("You have already requested")
+            if self.__data_member[1] == "lead":
+                print("3. Edit project 🖋️")
+            print("0. Exit Program ❌")
+            requested = self.check_request_project()
+            number_choice = input("Select choice: ")
+            # number_choice = "2"
+            if number_choice == "0":
+                break
+            if number_choice == "1":
+                self.view_project()
+            elif number_choice == "2":
+                if self.__data_member[1] == "lead":
+                    print("You are lead of project, so you can not create project")
+                    return None
+                if not requested:
+                    # ? create project
+                    self.create_project()
+                    self.view_project()
+                else:
+                    print("You have already requested")
+            elif number_choice == "3":
+                if self.__data_member[1] == "lead":
+                    self.edit_project()
+                else:
+                    print("You are not lead of project, so you can not edit project")
+                    return None
 
 
 if val[1] == "admin":
@@ -326,8 +447,8 @@ if val[1] == "admin":
 elif val[1] == "advisor":
     pass
 elif val[1] == "lead":
-    pass
-elif val[1] == "member":
+    ProcessMember(val).select_action()
+elif val[1] == "student" or val[1] == "member":
     ProcessMember(val).select_action()
 elif val[1] == "faculty":
     pass
