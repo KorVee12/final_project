@@ -158,7 +158,7 @@ def login():
         if password:
             break
 
-    users = db.get_tables()[1].get_row()
+    users = db.get_tables()[1].query_row(db.name)
 
     for i in users:
         if i["username"] == username and i["password"] == password:
@@ -196,23 +196,109 @@ class ProcessMember:
         self.__data_member
         return False
 
+    def change_role(self, new_role, data_user):
+        data_user["role"] = new_role
+        login_table.update_row(
+            data_user["person_id"],
+            "person_id",
+            data_user,
+            ["person_id", "username", "password", "role"],
+            db,
+        )
+
+    def invite_member(self, name) -> str:
+        """
+        The function `invite_member` selects a member from a login table based on their role being
+        "student" and returns their username.
+        :return: a string, which is the username of the selected member 1.
+        """
+        data = login_table.query_row(db.name)
+        count = 0
+        print(f"Select {name}".center(30, "-"))
+        print(data)
+        for i in data:
+            if i["role"] == "student":
+                count += 1
+                print(f"{count}. {i['username']}")
+        number_member = input(f"Select invite {name}: ")
+        count = 0
+        if number_member:
+            for i in data:
+                if i["role"] == "student":
+                    count += 1
+                    if int(number_member) == count:
+                        self.change_role("member", i)
+                        self.send_request("member", i)
+                        print(f"Invite {i['username']} to {name} success")
+                        return i["username"]
+        else:
+            return None
+
+    def invite_advisor(self, name) -> str:
+        data = login_table.query_row(db.name)
+        count = 0
+        print(f"Select {name}".center(30, "-"))
+        for i in data:
+            if i["role"] == "faculty":
+                count += 1
+                print(f"{count}. {i['username']}")
+        number_advisor = input(f"Select invite {name}: ")
+        count = 0
+        if number_advisor:
+            for i in data:
+                if i["role"] == "faculty":
+                    count += 1
+                    if int(number_advisor) == count:
+                        self.change_role("advisor", i)
+                        self.send_request("advisor", i)
+                        print(f"Invite {i['username']} to {name} success")
+                        return i["username"]
+        else:
+            return None
+
+    def send_request(self, role_name, data_user):
+        if role_name == "member":
+            data = {
+                "project_id": self.project_id,
+                "to_be_member": data_user["username"],
+                "response": None,
+                "response_date": None,
+            }
+
+            member_pending_request_table.add_data_one(
+                ["project_id", "to_be_member", "response", "response_date"], data, db
+            )
+        elif role_name == "advisor":
+            data = {
+                "project_id": self.project_id,
+                "to_be_advisor": data_user["username"],
+                "response": None,
+                "response_date": None,
+            }
+
+            advisor_pending_request_table.add_data_one(
+                ["project_id", "to_be_advisor", "response", "response_date"], data, db
+            )
+
     def create_project(self):
         title = input("Enter title Project: ")
         data = login_table.get_data_one(val[0], "person_id", db)
         # member 1 and member 2 and advisor will for loop show data all of select
+        self.project_id = str(uuid.uuid4())
         project_table.add_row(
             [
-                uuid.uuid4(),
-                title,
-                data["username"],
-                "member1",
-                "member2",
-                "advisor",
-                "pedding_member",
+                {
+                    "project_id": self.project_id,
+                    "title": title,
+                    "lead": data["username"],
+                    "member1": self.invite_member("member 1"),
+                    "member2": self.invite_member("member 2"),
+                    "advisor": self.invite_advisor("advisor"),
+                    "status": "pendding_member",
+                }
             ]
         )
-
-        # self.__data_member
+        db.add_row_table(project_table)
 
         # send request to students from data login table
 
@@ -230,9 +316,6 @@ class ProcessMember:
 
                 # ? create project
                 self.create_project()
-
-                # ? change role to lead at login table for this member
-                # self.change_role_lead_login()
 
             else:
                 print("You have already requested")
