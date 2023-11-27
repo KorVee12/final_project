@@ -387,7 +387,6 @@ class ProcessMember:
         data = project_table.query_row(db.name)
         for i in data:
             if i["lead"] == self.__data_member[0]:
-                # print(self.update_project())
                 project_table.update_row(
                     id=i["project_id"],
                     field_id="project_id",
