@@ -2,7 +2,7 @@
 
 ## database.py
    
-- `get_persons(filename_csv="persons.csv")` 
+- [X] `get_persons(filename_csv="persons.csv")` 
   This function use for called `persons.csv` and return list of persons in dictionary. 
 
 ```py
@@ -21,7 +21,7 @@ def get_persons(filename_csv="persons.csv"):
     return persons
 ```
 
-- `Database` is a class to use for collect the data from `Table` class. 
+- [X] `Database` is a class to use for collect the data from `Table` class. 
 
 ```py
 class Database:
@@ -36,13 +36,13 @@ class Database:
         return self.tables
 ```
 
--  `def __init__(self, name_db)` add two attribute are `name` and `tables`.
+- [X]  `def __init__(self, name_db)` add two attribute are `name` and `tables`.
 
-- `add_table(self, table_object)` this method use to add `table_object` in `tables` list.
+- [X] `add_table(self, table_object)` this method use to add `table_object` in `tables` list.
 
-- `get_tables(self)` return `tables`
+- [X] `get_tables(self)` return `tables`
 
-- `Table` is a class for creating table objects.
+- [X] `Table` is a class for creating table objects.
 ```py
 class Table:
     def __init__(self, table_name):
@@ -70,15 +70,15 @@ class Table:
     def __repr__(self) -> str:
         return f"Tables {self.name}"
 ```
-- `def __init__(self, table_name)` add three attribute are `name`, `__list_dict` and `__fields`.
+- [X] `def __init__(self, table_name)` add three attribute are `name`, `__list_dict` and `__fields`.
 
-- `add_fields(self, data: list)` this method use to add `data` in `__fields` list for create field in table.
+- [X] `add_fields(self, data: list)` this method use to add `data` in `__fields` list for create field in table.
 
-- `add_row(self, data: list)` this method use to add `data` in `__list_dict` list for create row in table.
+- [X] `add_row(self, data: list)` this method use to add `data` in `__list_dict` list for create row in table.
 
-- `get_row(self)` return `__list_dict`
+- [X] `get_row(self)` return `__list_dict`
 
-- `def __repr__(self)` return `Tables {self.name}`
+- [X] `def __repr__(self)` return `Tables {self.name}`
 
 # project_manage.py
 
@@ -92,13 +92,13 @@ db = Database("project_manage")
 buff_seed = 1
 ```
 
-- `from database import Database, Table, get_persons` import `Database`, `Table` and `get_persons` from `database` module.
-- `db = Database("project_manage")` create `db` object.
-- `buff_seed = 1` for random seed
+- [X] `from database import Database, Table, get_persons` import `Database`, `Table` and `get_persons` from `database` module.
+- [X] `db = Database("project_manage")` create `db` object.
+- [X] `buff_seed = 1` for random seed
 
 ### `def initializing()`
 
-- create an object to read an input csv file, persons.csv
+- [X] create an object to read an input csv file, persons.csv
 ```py
 class Persons:
         def __init__(self):
@@ -106,24 +106,24 @@ class Persons:
 persons = Persons().persons
 ```
 
-- create a 'persons' table
+- [X] create a 'persons' table
 ```py
 persons_table = Table("persons")
 persons_table.add_fields(["ID", "fist", "last", "type"])
 persons_table.add_row(persons)
 ```
 
-- add the 'persons' table into the database
+- [X] add the 'persons' table into the database
 ```py
 db.add_table(persons_table)
 ```
 
-- create a 'login' table
+- [X] create a 'login' table
 ```py
 login_table = Table("login")
 ```
 
-- the 'login' table has the following keys (attributes)  person_id , username ,password , role this function change the keys from 'ID' to 'person_id' , 'fist' to 'username' , 'last' to 'password' , 'type' to 'role'
+- [X] the 'login' table has the following keys (attributes)  person_id , username ,password , role this function change the keys from 'ID' to 'person_id' , 'fist' to 'username' , 'last' to 'password' , 'type' to 'role'
 ```py
 def change_name_in_dict(input_dict):
     output_dict = copy.deepcopy(input_dict)
@@ -135,12 +135,12 @@ def change_name_in_dict(input_dict):
 
     return output_dict
 ```
-- a person_id is the same as that in the 'persons' table
+- [X] a person_id is the same as that in the 'persons' table
 ```py
 item["person_id"] = item.pop("ID")
 ``` 
 
-- let a username be a person's fisrt name followed by a dot and the first letter of that person's last name
+- [X] let a username be a person's fisrt name followed by a dot and the first letter of that person's last name
 ```py
 def change_username_password(login_member):
     for i in login_member:
@@ -149,7 +149,7 @@ def change_username_password(login_member):
     return login_member
 ```
 
-- let a password be a random four digits string
+- [X] let a password be a random four digits string
 ```py
 def random_string(length):
     global buff_seed
@@ -160,7 +160,7 @@ def random_string(length):
     return result
 ```
 
-- let the initial role of all the students be Member and the initial role of all the faculties be faculty
+- [X] let the initial role of all the students be Member and the initial role of all the faculties be faculty
 ```py
 def change_role(login_member):
     for i in login_member:
@@ -171,19 +171,19 @@ def change_role(login_member):
     return login_member
 ```
 
-- create a login table by performing a series of insert operations; each insert adds a dictionary to a list
+- [X] create a login table by performing a series of insert operations; each insert adds a dictionary to a list
 ```py
 login_table.add_row(login_member)
 ```
 
-- add the 'login' table into the database
+- [X] add the 'login' table into the database
 ```py
 db.add_table(login_table)
 ```
 
 ### `def login()`
 
-- ask a user for a username and password
+- [X] ask a user for a username and password
 ```py
 while True:
     username = input("Enter username: ")
@@ -196,12 +196,12 @@ while True:
         break
 ```
 
-- get data from 'login' table
+ get data from 'login' table
 ```py
 users = db.get_tables()[1].get_row()
 ```
 
-- check the username and password have the same in login table returns [person_id, role] if valid, otherwise returning None
+- [X] check the username and password have the same in login table returns [person_id, role] if valid, otherwise returning None
 ```py
 for i in users:
     if i["username"] == username and i["password"] == password:
@@ -211,3 +211,4 @@ for i in users:
 
 return None
 ```
+
