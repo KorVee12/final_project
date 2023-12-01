@@ -7,6 +7,7 @@ import random
 import string
 import os
 import uuid
+import datetime
 
 # initialize the database
 db = Database("project_manage_db")
@@ -179,11 +180,12 @@ def login(username=None, password=None):
 
 initializing()
 # val = login()
-val = login("Hugo.H", "3oz5")
+# val = login("Hugo.H", "3oz5") # ! lead
+val = login("Lionel.L", "1i1r")  # ! member
 # print(val)
-# 4788888,Thiago.T,sa4a,member
-# 4720327,David.D,vm0y,faculty
-# 1228464,Hugo.H,3oz5,student
+# ! Lionel.L,1i1r,member1
+#! Robert.R,zbx1 member2
+# ! Marco.M,r4yn,advisor
 # val = ["4788888", "member"]
 # END part 1
 
@@ -194,14 +196,31 @@ val = login("Hugo.H", "3oz5")
 
 class ProcessMember:
     def __init__(self, val):
+        # [id,role]
         self.__data_member = val
 
     # ! Yet not complete !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     def check_request_project(self) -> bool:
-        self.__data_member
-        return False
+        if self.__data_member[-1] == "member":
+            member_pending = member_pending_request_table.get_data_one(
+                self.__data_member[0], "to_be_member", db
+            )
+            if member_pending["response"] != "yes":
+                return True
+            else:
+                return False
+        elif self.__data_member[-1] == "advisor":
+            advisor_pending = advisor_pending_request_table.get_data_one(
+                self.__data_member[0], "to_be_advisor", db
+            )
+            if advisor_pending["response"] != "yes":
+                return True
+            else:
+                return False
+        else:
+            return False
 
-    def change_role(self, new_role, data_user):
+    def change_role(self, new_role: str, data_user: dict):
         data_user["role"] = new_role
         login_table.update_row(
             data_user["person_id"],
@@ -309,29 +328,34 @@ class ProcessMember:
 
         # send request to students from data login table
 
-    def view_project(self):
-        while True:
-            print(" View project ".center(30, "-"))
-            data = project_table.query_row(db.name)
-            for i in data:
-                if i["lead"] == self.__data_member[0]:
-                    for k, v in i.items():
-                        if (
-                            k == "lead"
-                            or k == "member1"
-                            or k == "member2"
-                            or k == "advisor"
-                        ):
-                            v = login_table.get_data_one(v, "person_id", db)["username"]
-                        if k == "status":
-                            if v == "pendding_member":
-                                v = "Pendding..."
-                            elif v == "accept_member":
-                                v = "Accept"
-                            elif v == "reject_member":
-                                v = "Reject"
+    def view_project(self, show_toolbar=True):
+        print(" View project ".center(30, "-"))
+        data = project_table.query_row(db.name)
+        for i in data:
+            if (
+                i["lead"] == self.__data_member[0]
+                or i["member1"] == self.__data_member[0]
+                or i["member2"] == self.__data_member[0]
+                or i["advisor"] == self.__data_member[0]
+            ):
+                for k, v in i.items():
+                    if (
+                        k == "lead"
+                        or k == "member1"
+                        or k == "member2"
+                        or k == "advisor"
+                    ):
+                        v = login_table.get_data_one(v, "person_id", db)["username"]
+                    if k == "status":
+                        if v == "pendding_member":
+                            v = "Pendding..."
+                        elif v == "accept_member":
+                            v = "Accept"
+                        elif v == "reject_member":
+                            v = "Reject"
 
-                        print(f"{k} : {v}")
+                    print(f"{k} : {v}")
+        while show_toolbar:
             print("--------------".center(30, "-"))
             print("")
             print("1. Back to menu ⬅️")
@@ -405,46 +429,191 @@ class ProcessMember:
             break
         self.view_project()
 
+    def response_request_project(self):
+        self.view_project(show_toolbar=False)
+
+        while True:
+            print()
+            print("Answer the request project ?")
+            res = input("Yes or No (y/n) : ").lower()
+            if self.__data_member[1] == "member":
+                member_peding = member_pending_request_table.get_data_one(
+                    self.__data_member[0], "to_be_member", db
+                )
+            if self.__data_member[1] == "advisor":
+                advisor_peding = advisor_pending_request_table.get_data_one(
+                    self.__data_member[0], "to_be_advisor", db
+                )
+            if res == "y":
+                if self.__data_member[1] == "member":
+                    member_peding["response"] = "yes"
+                    member_peding["response_date"] = datetime.datetime.now()
+                    member_pending_request_table.update_row(
+                        id=member_peding["project_id"],
+                        field_id="project_id",
+                        dict_data=member_peding,
+                        fieldname=[
+                            "project_id",
+                            "to_be_member",
+                            "response",
+                            "response_date",
+                        ],
+                        db_object=db,
+                    )
+                elif self.__data_member[1] == "advisor":
+                    pass
+                    # advisor_peding["response"] = "yes"
+                    # advisor_peding["response_date"] = datetime.datetime.now()
+                    # advisor_pending_request_table.update_row(
+                    #     id=advisor_peding["project_id"],
+                    #     field_id="project_id",
+                    #     dict_data=advisor_peding,
+                    #     fieldname=[
+                    #         "project_id",
+                    #         "to_be_advisor",
+                    #         "response",
+                    #         "response_date",
+                    #     ],
+                    #     db_object=db,
+                    # )
+                    # project_advisor = project_table.get_data_one(
+                    #     self.__data_member[0], "advisor", db
+                    # )
+                    # project_advisor["status"] = "Approve"
+                    # project_table.update_row(
+                    #     id=advisor_peding["project_id"],
+                    #     field_id="project_id",
+                    #     dict_data=project_advisor,
+                    #     fieldname=[
+                    #         "project_id",
+                    #         "title",
+                    #         "lead",
+                    #         "member1",
+                    #         "member2",
+                    #         "advisor",
+                    #         "status",
+                    #     ],
+                    #     db_object=db,
+                    # )
+                break
+            elif res == "n":
+                if self.__data_member[1] == "member":
+                    member_pending_request_table.delete_row(
+                        id=member_peding["project_id"],
+                        field_id="project_id",
+                        fieldname=[
+                            "project_id",
+                            "to_be_member",
+                            "response",
+                            "response_date",
+                        ],
+                        db_object=db,
+                    )
+                    member1 = project_table.get_data_one(
+                        self.__data_member[0], "member1", db
+                    )
+                    member2 = project_table.get_data_one(
+                        self.__data_member[0], "member2", db
+                    )
+                    field_member = ""
+                    member = member1 if member1 != None else member2
+                    for k, v in member.items():
+                        if v == self.__data_member[0]:
+                            member[k] = ""
+                            field_member = k
+                            break
+
+                    project_table.update_row(
+                        id=self.__data_member[0],
+                        field_id=field_member,
+                        dict_data=member,
+                        fieldname=[
+                            "project_id",
+                            "title",
+                            "lead",
+                            "member1",
+                            "member2",
+                            "advisor",
+                            "status",
+                        ],
+                        db_object=db,
+                    )
+                    data = login_table.get_data_one(
+                        self.__data_member[0], "person_id", db
+                    )
+                    self.change_role("student", data)
+                    self.__data_member[-1] = "student"
+                elif self.__data_member[1] == "advisor":
+                    pass
+                break
+
+        while True:
+            print("--------------".center(30, "-"))
+            print("")
+            print("1. Back to menu ⬅️")
+            print("0. Exit Program ❌")
+            number_choice = input("Select choice: ")
+            if number_choice == "1":
+                break
+            elif number_choice == "0":
+                exit()
+
     def select_action(self):
         while True:
-            print("Menu for member".center(30, "-"))
-            print("1. View project 📃")
-
-            if self.__data_member[1] != "lead" and self.__data_member[1] != "member":
-                print("2. Create project 🪄")
-
-            if self.__data_member[1] == "lead":
-                print("3. Edit project 🖋️")
-            print("0. Exit Program ❌")
+            print("Menu".center(30, "-"))
             requested = self.check_request_project()
-            number_choice = input("Select choice: ")
-            # number_choice = "2"
-            if number_choice == "0":
-                break
-            if number_choice == "1":
-                self.view_project()
-            elif number_choice == "2":
+            if requested:
+                print("1. View request project 📃")
+                print("0. Exit Program ❌")
+                number_choice = input("Select choice: ")
+                if number_choice == "0":
+                    break
+                if number_choice == "1":
+                    self.response_request_project()
+
+            else:
+                if self.__data_member[1] != "student":
+                    print("1. View project 📃")
+
+                if self.__data_member[1] == "student":
+                    print("2. Create project 🪄")
+
                 if self.__data_member[1] == "lead":
-                    print("You are lead of project, so you can not create project")
-                    return None
-                if not requested:
-                    # ? create project
-                    self.create_project()
-                    self.view_project()
-                else:
-                    print("You have already requested")
-            elif number_choice == "3":
-                if self.__data_member[1] == "lead":
-                    self.edit_project()
-                else:
-                    print("You are not lead of project, so you can not edit project")
-                    return None
+                    print("3. Edit project 🖋️")
+                print("0. Exit Program ❌")
+
+                number_choice = input("Select choice: ")
+                if number_choice == "0":
+                    break
+                if number_choice == "1":
+                    if self.__data_member[1] != "student":
+                        self.view_project()
+                    else:
+                        print("You not lead project")
+                elif number_choice == "2":
+                    if self.__data_member[1] == "lead":
+                        print("You are lead of project, so you can not create project")
+                        return None
+                    if not requested:
+                        # ? create project
+                        self.create_project()
+                        self.view_project()
+                    else:
+                        print("You have already requested")
+                elif number_choice == "3":
+                    if self.__data_member[1] == "lead":
+                        self.edit_project()
+                    else:
+                        print(
+                            "You are not lead of project, so you can not edit project"
+                        )
+                        return None
 
 
 if val[1] == "admin":
     pass
 elif val[1] == "advisor":
-    pass
+    ProcessMember(val).select_action()
 elif val[1] == "lead":
     ProcessMember(val).select_action()
 elif val[1] == "student" or val[1] == "member":
