@@ -181,7 +181,7 @@ def login(username=None, password=None):
 initializing()
 # val = login()
 # val = login("Hugo.H", "3oz5") # ! lead
-val = login("Lionel.L", "1i1r")  # ! member
+val = login("Hugo.H", "3oz5")  # ! member
 # print(val)
 # ! Lionel.L,1i1r,member1
 #! Robert.R,zbx1 member2
@@ -317,7 +317,7 @@ class ProcessMember:
                     "member1": self.invite_member("member 1"),
                     "member2": self.invite_member("member 2"),
                     "advisor": self.invite_advisor("advisor"),
-                    "status": "pendding_member",
+                    "status": "pendding",
                 }
             ]
         )
@@ -345,14 +345,15 @@ class ProcessMember:
                         or k == "member2"
                         or k == "advisor"
                     ):
-                        v = login_table.get_data_one(v, "person_id", db)["username"]
+                        try:
+                            v = login_table.get_data_one(v, "person_id", db)["username"]
+                        except:
+                            v = ""
                     if k == "status":
-                        if v == "pendding_member":
+                        if v == "pendding":
                             v = "Pendding..."
-                        elif v == "accept_member":
+                        elif v == "approve":
                             v = "Accept"
-                        elif v == "reject_member":
-                            v = "Reject"
 
                     print(f"{k} : {v}")
         while show_toolbar:
@@ -460,41 +461,44 @@ class ProcessMember:
                         ],
                         db_object=db,
                     )
+                    print("You are already in my team.")
                 elif self.__data_member[1] == "advisor":
-                    pass
-                    # advisor_peding["response"] = "yes"
-                    # advisor_peding["response_date"] = datetime.datetime.now()
-                    # advisor_pending_request_table.update_row(
-                    #     id=advisor_peding["project_id"],
-                    #     field_id="project_id",
-                    #     dict_data=advisor_peding,
-                    #     fieldname=[
-                    #         "project_id",
-                    #         "to_be_advisor",
-                    #         "response",
-                    #         "response_date",
-                    #     ],
-                    #     db_object=db,
-                    # )
-                    # project_advisor = project_table.get_data_one(
-                    #     self.__data_member[0], "advisor", db
-                    # )
-                    # project_advisor["status"] = "Approve"
-                    # project_table.update_row(
-                    #     id=advisor_peding["project_id"],
-                    #     field_id="project_id",
-                    #     dict_data=project_advisor,
-                    #     fieldname=[
-                    #         "project_id",
-                    #         "title",
-                    #         "lead",
-                    #         "member1",
-                    #         "member2",
-                    #         "advisor",
-                    #         "status",
-                    #     ],
-                    #     db_object=db,
-                    # )
+                    advisor_peding["response"] = "yes"
+                    advisor_peding["response_date"] = datetime.datetime.now()
+                    advisor_pending_request_table.update_row(
+                        id=advisor_peding["project_id"],
+                        field_id="project_id",
+                        dict_data=advisor_peding,
+                        fieldname=[
+                            "project_id",
+                            "to_be_advisor",
+                            "response",
+                            "response_date",
+                        ],
+                        db_object=db,
+                    )
+                    project_advisor = project_table.get_data_one(
+                        self.__data_member[0], "advisor", db
+                    )
+                    project_advisor["status"] = "approve"
+                    project_table.update_row(
+                        id=advisor_peding["project_id"],
+                        field_id="project_id",
+                        dict_data=project_advisor,
+                        fieldname=[
+                            "project_id",
+                            "title",
+                            "lead",
+                            "member1",
+                            "member2",
+                            "advisor",
+                            "status",
+                        ],
+                        db_object=db,
+                    )
+                    print(
+                        "Your project have been approved, and we will be advisor for this project."
+                    )
                 break
             elif res == "n":
                 if self.__data_member[1] == "member":
@@ -543,8 +547,39 @@ class ProcessMember:
                     )
                     self.change_role("student", data)
                     self.__data_member[-1] = "student"
+                    print("You have declided.")
                 elif self.__data_member[1] == "advisor":
-                    pass
+                    advisor_pending_request_table.delete_row(
+                        id=advisor_peding["project_id"],
+                        field_id="project_id",
+                        fieldname=[
+                            "project_id",
+                            "to_be_advisor",
+                            "response",
+                            "response_date",
+                        ],
+                        db_object=db,
+                    )
+                    project_table.delete_row(
+                        id=advisor_peding["project_id"],
+                        field_id="project_id",
+                        fieldname=[
+                            "project_id",
+                            "title",
+                            "lead",
+                            "member1",
+                            "member2",
+                            "advisor",
+                            "status",
+                        ],
+                        db_object=db,
+                    )
+                    data = login_table.get_data_one(
+                        self.__data_member[0], "person_id", db
+                    )
+                    self.change_role("faculty", data)
+                    self.__data_member[-1] = "faculty"
+                    print("Your project has been declided.")
                 break
 
         while True:
@@ -560,10 +595,10 @@ class ProcessMember:
 
     def select_action(self):
         while True:
-            print("Menu".center(30, "-"))
+            print(f"Menu For {self.__data_member[1].capitalize()}".center(30, "-"))
             requested = self.check_request_project()
             if requested:
-                print("1. View request project 📃")
+                print("1. View request project 👁️")
                 print("0. Exit Program ❌")
                 number_choice = input("Select choice: ")
                 if number_choice == "0":

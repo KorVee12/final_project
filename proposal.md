@@ -20,13 +20,14 @@
 - [ ] If `lead` delete the project, `member` will change their role back to `student`.
 - [ ] If `lead` delete the project, `adivisor` will change their role back to `faculty`.
 - [ ] If `lead` delete the project, `lead` will change their role back to `student`.
+- [ ] `Lead` can view all `member` after `member` have accepted the request.
 
 # Advisor role
-- [ ]  Accept or reject the request invite message from `lead`.
-- [ ]  If `advisor` accept the request, `advisor` can view the project's detail.
-- [ ]  If `advisor` reject the request, `advisor` will change their role back to `faculty` and then they can do the same thing like `faculty` role and `advisor` will delete that project then `lead`'s role will change back to `student`. 
+- [X]  Accept or reject the request invite message from `lead`.
+- [X]  If `advisor` accept the request, `advisor` can view the project's detail.
+- [X]  If `advisor` reject the request, `advisor` will change their role back to `faculty` and then they can do the same thing like `faculty` role and `advisor` will delete that project then `lead`'s role will change back to `student`. 
 - [ ]  `Advisor` can score all project accept `advisor`'s project.
-- [ ]  `Advisor` can view all project.
+- [X]  `Advisor` can view all project.
 
 # Faculty role
 - [ ]  `Faculty` can view all project.
