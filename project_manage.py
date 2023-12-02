@@ -360,12 +360,17 @@ class ProcessMember:
             print("--------------".center(30, "-"))
             print("")
             print("1. Back to menu ⬅️")
+            print("2. Delete this project")
+
             print("0. Exit Program ❌")
             number_choice = input("Select choice: ")
             if number_choice == "1":
                 break
             elif number_choice == "0":
                 exit()
+            elif number_choice == "2":
+                self.delete_project()
+                break
 
     def back_to_basic(self, person_id, new_role):
         data = login_table.query_row(db.name)
@@ -430,6 +435,29 @@ class ProcessMember:
             break
         self.view_project()
 
+    def delete_project(self):
+        print("Are you sure to delete this project ?")
+        choice = input("Yes or No (y/n): ").lower()
+        if choice == "y":
+            data = login_table.get_data_one(self.__data_member[0], "person_id", db)
+            project_table.delete_row(
+                id=data["person_id"],
+                field_id="lead",
+                fieldname=[
+                    "project_id",
+                    "title",
+                    "lead",
+                    "member1",
+                    "member2",
+                    "advisor",
+                    "status",
+                ],
+                db_object=db,
+            )
+            self.change_role("student", data)
+            self.__data_member[1] = "student"
+            print("Delete this project success.")
+
     def response_request_project(self):
         self.view_project(show_toolbar=False)
 
@@ -442,7 +470,7 @@ class ProcessMember:
                     self.__data_member[0], "to_be_member", db
                 )
             if self.__data_member[1] == "advisor":
-                advisor_peding = advisor_pending_request_table.get_data_one(
+                advisor_pending = advisor_pending_request_table.get_data_one(
                     self.__data_member[0], "to_be_advisor", db
                 )
             if res == "y":
@@ -463,12 +491,12 @@ class ProcessMember:
                     )
                     print("You are already in my team.")
                 elif self.__data_member[1] == "advisor":
-                    advisor_peding["response"] = "yes"
-                    advisor_peding["response_date"] = datetime.datetime.now()
+                    advisor_pending["response"] = "yes"
+                    advisor_pending["response_date"] = datetime.datetime.now()
                     advisor_pending_request_table.update_row(
-                        id=advisor_peding["project_id"],
+                        id=advisor_pending["project_id"],
                         field_id="project_id",
-                        dict_data=advisor_peding,
+                        dict_data=advisor_pending,
                         fieldname=[
                             "project_id",
                             "to_be_advisor",
@@ -482,7 +510,7 @@ class ProcessMember:
                     )
                     project_advisor["status"] = "approve"
                     project_table.update_row(
-                        id=advisor_peding["project_id"],
+                        id=advisor_pending["project_id"],
                         field_id="project_id",
                         dict_data=project_advisor,
                         fieldname=[
@@ -550,7 +578,7 @@ class ProcessMember:
                     print("You have declided.")
                 elif self.__data_member[1] == "advisor":
                     advisor_pending_request_table.delete_row(
-                        id=advisor_peding["project_id"],
+                        id=advisor_pending["project_id"],
                         field_id="project_id",
                         fieldname=[
                             "project_id",
@@ -561,7 +589,7 @@ class ProcessMember:
                         db_object=db,
                     )
                     project_table.delete_row(
-                        id=advisor_peding["project_id"],
+                        id=advisor_pending["project_id"],
                         field_id="project_id",
                         fieldname=[
                             "project_id",
