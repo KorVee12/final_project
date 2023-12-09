@@ -186,6 +186,10 @@ val = login("Hugo.H", "3oz5")  # ! member
 # ! Lionel.L,1i1r,member1
 #! Robert.R,zbx1 member2
 # ! Marco.M,r4yn,advisor
+# ! Arjen.A,dink,advisor
+# ! Toni.T,epgy lead
+# ! Karim.K,cyh0,faculty
+
 # val = ["4788888", "member"]
 # END part 1
 
@@ -439,9 +443,29 @@ class ProcessMember:
         print("Are you sure to delete this project ?")
         choice = input("Yes or No (y/n): ").lower()
         if choice == "y":
-            data = login_table.get_data_one(self.__data_member[0], "person_id", db)
+            data_lead = login_table.get_data_one(self.__data_member[0], "person_id", db)
+            data_project = project_table.get_data_one(
+                id=data_lead["person_id"], field_id="lead", db_object=db
+            )
+
+            try:
+                data_member_1 = login_table.get_data_one(
+                    data_project["member1"], "person_id", db
+                )
+            except:
+                data_member_1 = None
+            try:
+                data_member_2 = login_table.get_data_one(
+                    data_project["member2"], "person_id", db
+                )
+            except:
+                data_member_2 = None
+            data_advisor = login_table.get_data_one(
+                data_project["advisor"], "person_id", db
+            )
+
             project_table.delete_row(
-                id=data["person_id"],
+                id=data_lead["person_id"],
                 field_id="lead",
                 fieldname=[
                     "project_id",
@@ -454,7 +478,43 @@ class ProcessMember:
                 ],
                 db_object=db,
             )
-            self.change_role("student", data)
+
+            advisor_pending_request_table.delete_row(
+                id=data_advisor["person_id"],
+                field_id="to_be_advisor",
+                fieldname=["project_id", "to_be_advisor", "response", "response_date"],
+                db_object=db,
+            )
+            self.change_role("faculty", data_advisor)
+
+            if data_member_1:
+                member_pending_request_table.delete_row(
+                    id=data_member_1["person_id"],
+                    field_id="to_be_member",
+                    fieldname=[
+                        "project_id",
+                        "to_be_member",
+                        "response",
+                        "response_date",
+                    ],
+                    db_object=db,
+                )
+                self.change_role("student", data_member_1)
+            if data_member_2:
+                member_pending_request_table.delete_row(
+                    id=data_member_2["person_id"],
+                    field_id="to_be_member",
+                    fieldname=[
+                        "project_id",
+                        "to_be_member",
+                        "response",
+                        "response_date",
+                    ],
+                    db_object=db,
+                )
+                self.change_role("student", data_member_2)
+
+            self.change_role("student", data_lead)
             self.__data_member[1] = "student"
             print("Delete this project success.")
 
@@ -508,7 +568,6 @@ class ProcessMember:
                     project_advisor = project_table.get_data_one(
                         self.__data_member[0], "advisor", db
                     )
-                    project_advisor["status"] = "approve"
                     project_table.update_row(
                         id=advisor_pending["project_id"],
                         field_id="project_id",
@@ -621,9 +680,88 @@ class ProcessMember:
             elif number_choice == "0":
                 exit()
 
-    def select_action(self):
+    def view_all_projects(self):
+        data = project_table.query_row(db.name)
+        print(" View all projects ".center(30, "-"))
+        count = 0
+        for i in data:
+            count += 1
+            print(f"{count}. Project name: {i['title']}")
+
         while True:
+            print(f" {count} projects ".center(30, "-"))
+            print("")
+            print("1. Back to menu ⬅️")
+            print("0. Exit Program ❌")
+            number_choice = input("Select choice: ")
+            if number_choice == "1":
+                break
+            elif number_choice == "0":
+                exit()
+
+    def faculty_select_action(self):
+        while True:
+            if self.__data_member[1] != "faculty":
+                break
             print(f"Menu For {self.__data_member[1].capitalize()}".center(30, "-"))
+            print("1. View all projects 📃")
+            print("0. Exit Program ❌")
+            number_choice = input("Select choice: ")
+            if number_choice == "0":
+                break
+            if number_choice == "1":
+                self.view_all_projects()
+
+    def advisor_select_action(self):
+        while True:
+            if self.__data_member[1] != "advisor":
+                break
+            print(f"Menu For {self.__data_member[1].capitalize()}".center(30, "-"))
+            requested = self.check_request_project()
+            if requested:
+                print("1. View request project 👁️")
+                print("2. View all projects 📃")
+                print("0. Exit Program ❌")
+                number_choice = input("Select choice: ")
+                if number_choice == "0":
+                    break
+                if number_choice == "1":
+                    self.response_request_project()
+                if number_choice == "2":
+                    self.view_all_projects()
+            else:
+                print("1. View project's advisor 📃")
+                print("2. View all projects 📃")
+                print("0. Exit Program ❌")
+                if number_choice == "0":
+                    break
+                if number_choice == "1":
+                    self.view_project()
+                if number_choice == "2":
+                    self.view_all_projects()
+
+    def lead_select_action(self):
+        while True:
+            if self.__data_member[1] != "lead":
+                break
+            print(f"Menu For {self.__data_member[1].capitalize()}".center(30, "-"))
+            print("1. View project's lead 📃")
+            print("2. Edit project 🖋️")
+            print("0. Exit Program ❌")
+            number_choice = input("Select choice: ")
+            if number_choice == "0":
+                break
+            if number_choice == "1":
+                self.view_project()
+            if number_choice == "2":
+                self.edit_project()
+
+    def member_select_action(self):
+        while True:
+            if self.__data_member[1] != "member":
+                break
+            print(f"Menu For {self.__data_member[1].capitalize()}".center(30, "-"))
+            requested = self.check_request_project()
             requested = self.check_request_project()
             if requested:
                 print("1. View request project 👁️")
@@ -635,42 +773,40 @@ class ProcessMember:
                     self.response_request_project()
 
             else:
-                if self.__data_member[1] != "student":
-                    print("1. View project 📃")
-
-                if self.__data_member[1] == "student":
-                    print("2. Create project 🪄")
-
-                if self.__data_member[1] == "lead":
-                    print("3. Edit project 🖋️")
+                print("1. View project's member 📃")
                 print("0. Exit Program ❌")
-
                 number_choice = input("Select choice: ")
                 if number_choice == "0":
                     break
                 if number_choice == "1":
-                    if self.__data_member[1] != "student":
-                        self.view_project()
-                    else:
-                        print("You not lead project")
-                elif number_choice == "2":
-                    if self.__data_member[1] == "lead":
-                        print("You are lead of project, so you can not create project")
-                        return None
-                    if not requested:
-                        # ? create project
-                        self.create_project()
-                        self.view_project()
-                    else:
-                        print("You have already requested")
-                elif number_choice == "3":
-                    if self.__data_member[1] == "lead":
-                        self.edit_project()
-                    else:
-                        print(
-                            "You are not lead of project, so you can not edit project"
-                        )
-                        return None
+                    self.view_project()
+
+    def student_select_action(self):
+        while True:
+            if self.__data_member[1] != "student":
+                break
+            print(f"Menu For {self.__data_member[1].capitalize()}".center(30, "-"))
+            print("1. Create project 🪄")
+            print("0. Exit Program ❌")
+            number_choice = input("Select choice: ")
+            if number_choice == "0":
+                break
+            if number_choice == "1":
+                self.create_project()
+                self.view_project()
+
+    def select_action(self):
+        while True:
+            if self.__data_member[1] == "advisor":
+                self.advisor_select_action()
+            if self.__data_member[1] == "lead":
+                self.lead_select_action()
+            if self.__data_member[1] == "faculty":
+                self.faculty_select_action()
+            if self.__data_member[1] == "student":
+                self.student_select_action()
+            if self.__data_member[1] == "member":
+                self.member_select_action()
 
 
 if val[1] == "admin":
@@ -682,4 +818,4 @@ elif val[1] == "lead":
 elif val[1] == "student" or val[1] == "member":
     ProcessMember(val).select_action()
 elif val[1] == "faculty":
-    pass
+    ProcessMember(val).select_action()

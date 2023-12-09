@@ -26,12 +26,15 @@
 - [X]  Accept or reject the request invite message from `lead`.
 - [X]  If `advisor` accept the request, `advisor` can view the project's detail.
 - [X]  If `advisor` reject the request, `advisor` will change their role back to `faculty` and then they can do the same thing like `faculty` role and `advisor` will delete that project then `lead`'s role will change back to `student`. 
-- [ ]  `Advisor` can score all project accept `advisor`'s project.
-- [X]  `Advisor` can view all project.
+- [ ]  `Advisor` can view all project.
+- [X]  `Advisor` can view their own project.
+- [ ]  `Advisor` can evaluation the project, then `Advisor` must choose the project that `Advisor` have to evaluation.
+- [ ]   If `Advisor` have selected approve or reject, then project will add in table's evaluation project.
 
 # Faculty role
 - [ ]  `Faculty` can view all project.
-- [ ]  `Faculty` can score all project.
+- [ ]  `Faculty` can evaluation the project, then `Faculty` must choose the project that `Faculty` have to evaluation.
+- [ ]   If `Faculty` have selected approve or reject, then project will add in table's evaluation project.
 
 # Admin role
 - [ ]  `Admin` can view person's information in system.
