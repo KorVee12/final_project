@@ -18,6 +18,7 @@ login_table = Table("login")
 project_table = Table("project")
 advisor_pending_request_table = Table("advisor_pending_request")
 member_pending_request_table = Table("member_pending_request")
+evaluation_project_table = Table("evaluation_project")
 buff_seed = 1
 # define a funcion called initializing
 
@@ -143,6 +144,14 @@ def initializing():
 
     # add the 'member_pending_request' table into the database
     db.create_table(member_pending_request_table)
+
+    # create a 'evaluation_project' table
+    evaluation_project_table.add_fields(
+        ["project_id", "teacher_id", "evaluation_status", "evaluation_date"]
+    )
+
+    # # add the 'evaluation_project' table into the database
+    db.create_table(evaluation_project_table)
 
 
 # define a funcion called login
@@ -734,7 +743,7 @@ class ProcessMember:
                 print("2. View all projects 📃")
                 print("0. Exit Program ❌")
                 if number_choice == "0":
-                    break
+                    exit()
                 if number_choice == "1":
                     self.view_project()
                 if number_choice == "2":
@@ -750,7 +759,7 @@ class ProcessMember:
             print("0. Exit Program ❌")
             number_choice = input("Select choice: ")
             if number_choice == "0":
-                break
+                exit()
             if number_choice == "1":
                 self.view_project()
             if number_choice == "2":
@@ -768,7 +777,7 @@ class ProcessMember:
                 print("0. Exit Program ❌")
                 number_choice = input("Select choice: ")
                 if number_choice == "0":
-                    break
+                    exit()
                 if number_choice == "1":
                     self.response_request_project()
 
@@ -777,7 +786,7 @@ class ProcessMember:
                 print("0. Exit Program ❌")
                 number_choice = input("Select choice: ")
                 if number_choice == "0":
-                    break
+                    exit()
                 if number_choice == "1":
                     self.view_project()
 
@@ -790,7 +799,7 @@ class ProcessMember:
             print("0. Exit Program ❌")
             number_choice = input("Select choice: ")
             if number_choice == "0":
-                break
+                exit()
             if number_choice == "1":
                 self.create_project()
                 self.view_project()
