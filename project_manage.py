@@ -190,7 +190,7 @@ def login(username=None, password=None):
 initializing()
 # val = login()
 # val = login("Hugo.H", "3oz5") # ! lead
-val = login("Hugo.H", "3oz5")  # ! member
+val = login("Karim.K", "cyh0")  # ! member
 # print(val)
 # ! Lionel.L,1i1r,member1
 #! Robert.R,zbx1 member2
@@ -198,6 +198,7 @@ val = login("Hugo.H", "3oz5")  # ! member
 # ! Arjen.A,dink,advisor
 # ! Toni.T,epgy lead
 # ! Karim.K,cyh0,faculty
+# Henrikh.H,weic
 
 # val = ["4788888", "member"]
 # END part 1
@@ -212,7 +213,6 @@ class ProcessMember:
         # [id,role]
         self.__data_member = val
 
-    # ! Yet not complete !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     def check_request_project(self) -> bool:
         if self.__data_member[-1] == "member":
             member_pending = member_pending_request_table.get_data_one(
@@ -413,7 +413,7 @@ class ProcessMember:
                         advisor_new = self.invite_advisor("advisor")
                         self.back_to_basic(v, "faculty")
                     elif k == "status":
-                        status = v
+                        status = "pendding"
 
         return {
             "project_id": project_id,
@@ -708,18 +708,169 @@ class ProcessMember:
             elif number_choice == "0":
                 exit()
 
+    def evaluation_projects(self):
+        data = project_table.query_row(db.name)
+        print(" View all projects ".center(30, "-"), end="\n\n")
+        count = 0
+        for i in data:
+            count += 1
+            print(f"{count}. Project name: {i['title']} [{i['status']}]")
+        print("")
+        while True:
+            try:
+                number_choice = int(input("Select project's number : "))
+            except:
+                continue
+
+            if number_choice > 0:
+                number_choice -= 1
+                data_evaluation = evaluation_project_table.query_row(db.name)
+                for i in data_evaluation:
+                    if data[number_choice]["status"] == "approve":
+                        print("This project already approved!")
+                        return 0
+                    if i["project_id"] == data[number_choice]["project_id"]:
+                        if i["teacher_id"] == self.__data_member[0]:
+                            while True:
+                                evaluation_choice = input(
+                                    "You have evaluated this project and do you wanna edit? (y/n)"
+                                )
+                                if evaluation_choice == "y":
+                                    break
+                                if evaluation_choice == "n":
+                                    return 0
+                            break
+                print("Project's details".center(30, "-"))
+                for i in data[number_choice].items():
+                    if i[0] == "title":
+                        print("Title :", i[1])
+                    if i[0] == "lead":
+                        user = login_table.get_data_one(i[1], "person_id", db)
+                        print("Lead :", user["username"])
+                    if i[0] == "member1":
+                        user = login_table.get_data_one(i[1], "person_id", db)
+                        print("Member 1 :", user["username"])
+                    if i[0] == "Member2":
+                        user = login_table.get_data_one(i[1], "person_id", db)
+                        print("Member 2 :", user["username"])
+                    if i[0] == "advisor":
+                        user = login_table.get_data_one(i[1], "person_id", db)
+                        print("Advisor :", user["username"])
+                    if i[0] == "status":
+                        print("Status :", i[1])
+                while True:
+                    print("")
+                    choice = input("Approve or Reject (a/r): ")
+                    if choice == "a":
+                        evaluation_project_table.add_data_one(
+                            fieldname=[
+                                "project_id",
+                                "teacher_id",
+                                "evaluation_status",
+                                "evaluation_date",
+                            ],
+                            row_data={
+                                "project_id": data[number_choice]["project_id"],
+                                "teacher_id": self.__data_member[0],
+                                "evaluation_status": "approve",
+                                "evaluation_date": datetime.datetime.now(),
+                            },
+                            db_object=db,
+                        )
+                        break
+                    elif choice == "r":
+                        evaluation_project_table.add_data_one(
+                            fieldname=[
+                                "project_id",
+                                "teacher_id",
+                                "evaluation_status",
+                                "evaluation_date",
+                            ],
+                            row_data={
+                                "project_id": data[number_choice]["project_id"],
+                                "teacher_id": self.__data_member[0],
+                                "evaluation_status": "reject",
+                                "evaluation_date": datetime.datetime.now(),
+                            },
+                            db_object=db,
+                        )
+                        break
+            evaluation_projects = evaluation_project_table.query_row(db.name)
+            project_current = data[number_choice]
+            status_approve = 0
+            status_reject = 0
+            for i in evaluation_projects:
+                if i["project_id"] == project_current["project_id"]:
+                    if i["evaluation_status"] == "approve":
+                        status_approve += 1
+                    else:
+                        status_reject += 1
+            if status_approve >= 2:
+                project_table.update_row(
+                    id=project_current["project_id"],
+                    field_id="project_id",
+                    dict_data={
+                        "project_id": project_current["project_id"],
+                        "title": project_current["title"],
+                        "lead": project_current["lead"],
+                        "member1": project_current["member1"],
+                        "member2": project_current["member2"],
+                        "advisor": project_current["advisor"],
+                        "status": "approve",
+                    },
+                    fieldname=[
+                        "project_id",
+                        "title",
+                        "lead",
+                        "member1",
+                        "member2",
+                        "advisor",
+                        "status",
+                    ],
+                    db_object=db,
+                )
+            if status_reject >= 2:
+                project_table.update_row(
+                    id=project_current["project_id"],
+                    field_id="project_id",
+                    dict_data={
+                        "project_id": project_current["project_id"],
+                        "title": project_current["title"],
+                        "lead": project_current["lead"],
+                        "member1": project_current["member1"],
+                        "member2": project_current["member2"],
+                        "advisor": project_current["advisor"],
+                        "status": "reject",
+                    },
+                    fieldname=[
+                        "project_id",
+                        "title",
+                        "lead",
+                        "member1",
+                        "member2",
+                        "advisor",
+                        "status",
+                    ],
+                    db_object=db,
+                )
+
+            break
+
     def faculty_select_action(self):
         while True:
             if self.__data_member[1] != "faculty":
                 break
             print(f"Menu For {self.__data_member[1].capitalize()}".center(30, "-"))
             print("1. View all projects 📃")
+            print("2. Evaluation projects 🖋️")
             print("0. Exit Program ❌")
             number_choice = input("Select choice: ")
             if number_choice == "0":
-                break
+                exit()
             if number_choice == "1":
                 self.view_all_projects()
+            if number_choice == "2":
+                self.evaluation_projects()
 
     def advisor_select_action(self):
         while True:
@@ -730,6 +881,7 @@ class ProcessMember:
             if requested:
                 print("1. View request project 👁️")
                 print("2. View all projects 📃")
+                print("3. Evaluation projects 🖋️")
                 print("0. Exit Program ❌")
                 number_choice = input("Select choice: ")
                 if number_choice == "0":
@@ -738,6 +890,8 @@ class ProcessMember:
                     self.response_request_project()
                 if number_choice == "2":
                     self.view_all_projects()
+                if number_choice == "3":
+                    self.evaluation_projects()
             else:
                 print("1. View project's advisor 📃")
                 print("2. View all projects 📃")
