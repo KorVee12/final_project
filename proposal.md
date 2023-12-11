@@ -23,18 +23,24 @@
 - [ ] `Lead` can view all `member` after `member` have accepted the request.
 
 # Advisor role
-- [X]  Accept or reject the request invite message from `lead`.
+- [X]  `accept` or` reject` the request invite message from `lead`.
 - [X]  If `advisor` accept the request, `advisor` can view the project's detail.
-- [X]  If `advisor` reject the request, `advisor` will change their role back to `faculty` and then they can do the same thing like `faculty` role and `advisor` will delete that project then `lead`'s role will change back to `student`. 
+- [X]  If `advisor` `reject` the request, `advisor` will change their role back to `faculty` and then they can do the same thing like `faculty` role and `advisor` will delete that project then `lead`'s role will change back to `student`. 
 - [X]  `Advisor` can view all project.
 - [X]  `Advisor` can view their own project.
-- [ ]  `Advisor` can evaluation the project, then `Advisor` must choose the project that `Advisor` have to evaluation.
-- [ ]   If `Advisor` have selected approve or reject, then project will add in table's evaluation project.
+- [X]  `Advisor` can evaluation the project, then `Advisor` must choose the project that `Advisor` have to evaluation.
+- [X]   If `Advisor` have selected `approve` or `reject`, then project will add in table's evaluation project.
+- [X]   If `Faculty` or `advisor` have approved more than 2 people then project will change status to be `approve`.
+- [X]   If `Faculty` or `advisor` have rejected more than 2 people then project will change status to be `reject`.
+- [X]   If `Advisor` have evaluated then will have notice about do you want edit or not.
 
 # Faculty role
 - [X]  `Faculty` can view all project.
-- [ ]  `Faculty` can evaluation the project, then `Faculty` must choose the project that `Faculty` have to evaluation.
-- [ ]   If `Faculty` have selected approve or reject, then project will add in table's evaluation project.
+- [X]  `Faculty` can evaluation the project, then `Faculty` must choose the project that `Faculty` have to evaluation.
+- [X]   If `Faculty` have selected `approve` or `reject`, then project will add in table's evaluation project.
+- [X]   If `Faculty` or `advisor` have approved more than 2 people then project will change status to be `approve`.
+- [X]   If `Faculty` or `advisor` have rejected more than 2 people then project will change status to be `reject`.
+- [X]   If `Faculty` have evaluated then will have notice about do you want edit or not.
 
 # Admin role
 - [ ]  `Admin` can view person's information in system.
