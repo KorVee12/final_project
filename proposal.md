@@ -20,7 +20,7 @@
 - [X] If `lead` delete the project, `member` will change their role back to `student`.
 - [X] If `lead` delete the project, `adivisor` will change their role back to `faculty`.
 - [X] If `lead` delete the project, `lead` will change their role back to `student`.
-- [ ] `Lead` can view all `member` after `member` have accepted the request.
+- [X] `Lead` can check all `member`'s `status` and if `member` have responded then response_date will be shown, but if not have responed then response_date will be `waiting for answer...`
 
 # Advisor role
 - [X]  `accept` or` reject` the request invite message from `lead`.

@@ -1,25 +1,23 @@
 # BEGIN part 1
 
 # import database module
-from database import Database, Table, get_persons
-from processMember import *
+from src.database import get_persons
+from src.processMember import (
+    db,
+    persons_table,
+    login_table,
+    project_table,
+    advisor_pending_request_table,
+    member_pending_request_table,
+    evaluation_project_table,
+    ProcessMember,
+)
 import copy
 import random
 import string
 import os
 
-# initialize the database
-db = Database("project_manage_db")
-
-# initialize the tables
-persons_table = Table("persons")
-login_table = Table("login")
-project_table = Table("project")
-advisor_pending_request_table = Table("advisor_pending_request")
-member_pending_request_table = Table("member_pending_request")
-evaluation_project_table = Table("evaluation_project")
 buff_seed = 1
-# define a funcion called initializing
 
 # here are things to do in this function:
 def initializing():
@@ -188,8 +186,8 @@ def login(username=None, password=None):
 
 initializing()
 # val = login()
-# val = login("Hugo.H", "3oz5") # ! lead
-val = login("Karim.K", "cyh0")  # ! member
+val = login("Hugo.H", "3oz5")  # ! lead
+# val = login("Karim.K", "cyh0")  # ! member
 # print(val)
 # ! Lionel.L,1i1r,member1
 #! Robert.R,zbx1 member2

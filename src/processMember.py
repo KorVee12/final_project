@@ -1,8 +1,4 @@
-from database import Database, Table, get_persons
-import copy
-import random
-import string
-import os
+from src.database import Database, Table
 import uuid
 import datetime
 
@@ -148,6 +144,7 @@ class ProcessMember:
         data = login_table.get_data_one(self.__data_member[0], "person_id", db)
         self.change_role("lead", data)
         self.__data_member = [data["person_id"], data["role"]]
+        print(project_table)
         db.add_row_table(project_table)
 
         # send request to students from data login table
@@ -184,7 +181,8 @@ class ProcessMember:
             print("--------------".center(30, "-"))
             print("")
             print("1. Back to menu ⬅️")
-            print("2. Delete this project")
+            if self.__data_member[1] == "lead":
+                print("2. Delete this project")
 
             print("0. Exit Program ❌")
             number_choice = input("Select choice: ")
@@ -193,7 +191,10 @@ class ProcessMember:
             elif number_choice == "0":
                 exit()
             elif number_choice == "2":
-                self.delete_project()
+                if self.__data_member[1] == "lead":
+                    self.delete_project()
+                else:
+                    print("You don't have permission")
                 break
 
     def back_to_basic(self, person_id, new_role):
@@ -404,7 +405,7 @@ class ProcessMember:
                         db_object=db,
                     )
                     print(
-                        "Your project have been approved, and we will be advisor for this project."
+                        "You are already be advisor for this project."
                     )
                 break
             elif res == "n":
@@ -713,6 +714,53 @@ class ProcessMember:
                     self.view_project()
                 if number_choice == "2":
                     self.view_all_projects()
+    def get_username(self,person_id):
+        data_login = login_table.get_data_one(person_id, "person_id", db)
+        return data_login["username"]
+    def view_member(self):
+        
+        data_project = project_table.get_data_one(self.__data_member[0], "lead", db)
+        data_member = member_pending_request_table.query_row(db.name)
+        
+        print(f" Member's project {data_project['title']} ".center(30, "-"))
+        
+        for i in data_member:
+            if i["project_id"] == data_project["project_id"]:
+                if i['response'] == "yes":
+                    print(f"{self.get_username(i['to_be_member'])} - response at {i['response_date']}")
+                else:
+                    print(f"{self.get_username(i['to_be_member'])} - waiting for anwser...")
+        
+        while True:
+            print("")
+            print("1. Back to menu ⬅️")
+            print("0. Exit Program ❌")
+            number_choice = input("Select choice: ")
+            if number_choice == "1":
+                break
+            elif number_choice == "0":
+                exit()
+    
+    def view_advisor(self):
+        data_project = project_table.get_data_one(self.__data_member[0], "lead", db)
+        data_advisor = advisor_pending_request_table.get_data_one(
+            data_project["project_id"], "project_id", db
+        )
+        print(f" Advisor's project {data_project['title']} ".center(30, "-"))
+        if data_advisor['response'] == "yes":
+            print(f"{self.get_username(data_advisor['to_be_advisor'])} - response at {data_advisor['response_date']}")
+        else:
+            print(f"{self.get_username(data_advisor['to_be_advisor'])} - waiting for anwser...")
+        
+        while True:
+            print("")
+            print("1. Back to menu ⬅️")
+            print("0. Exit Program ❌")
+            number_choice = input("Select choice: ")
+            if number_choice == "1":
+                break
+            elif number_choice == "0":
+                exit()
 
     def lead_select_action(self):
         while True:
@@ -721,6 +769,8 @@ class ProcessMember:
             print(f"Menu For {self.__data_member[1].capitalize()}".center(30, "-"))
             print("1. View project's lead 📃")
             print("2. Edit project 🖋️")
+            print("3. View member's project 💡")
+            print("4. View advisor's project 👨")
             print("0. Exit Program ❌")
             number_choice = input("Select choice: ")
             if number_choice == "0":
@@ -729,6 +779,10 @@ class ProcessMember:
                 self.view_project()
             if number_choice == "2":
                 self.edit_project()
+            if number_choice == "3":
+                self.view_member()
+            if number_choice == "4":
+                self.view_advisor()
 
     def member_select_action(self):
         while True:
