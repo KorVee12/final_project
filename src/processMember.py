@@ -1,6 +1,9 @@
+import copy
+import string
 from src.database import Database, Table
 import uuid
 import datetime
+import random
 
 # initialize the database
 db = Database("project_manage_db")
@@ -783,46 +786,93 @@ class ProcessMember:
                 break
             elif number_choice == "0":
                 exit()
+
+    def random_string(self,length):
+        characters = string.ascii_lowercase + string.digits
+        random.seed(6310545302 + datetime.datetime.now().timestamp())
+        result = "".join(random.choice(characters) for i in range(length))
+        return result
+    
+    def change_to_login(self,input_dict):
+        output_dict = copy.deepcopy(input_dict)
+        output_dict["person_id"] = output_dict.pop("ID")
+        output_dict["username"] = output_dict.pop("fist")
+        output_dict["password"] = output_dict.pop("last")
+        output_dict["role"] = output_dict.pop("type")
+        output_dict["username"] = "{}.{}".format(output_dict["username"], output_dict["username"][0])
+        output_dict["password"] = self.random_string(4)
+        return output_dict
+        
     
     def new_person(self):
         print(f" Add person to member ".center(30, "-"))
         new_person_dict = {
-            "ID",
-            "fist",
-            "last",
-            "type"
+            "ID":"",
+            "fist":"",
+            "last":"",
+            "type":""
         }
-        row_person = ["ID",
-            "fist",
-            "last",
-            "type"]
-        while True:            
-            person_id = input("Enter ID's person : ")
-            if len(person_id)== 7:
+        field_person = ["ID","fist","last","type"]
+
+        random.seed(datetime.datetime.now().timestamp())
+        number_id = random.randint(1000000,9999999)
+        data_person = persons_table.query_row(db.name)
+        for i in data_person:
+            if i["ID"] == number_id:
+                random.seed(datetime.datetime.now().timestamp())
+                number_id = random.randint(1000000,9999999)
                 break
-            else:
-                print("ID must equal 7 char")
+        new_person_dict["ID"] = number_id
+
         while True:            
             person_first= input("Enter First Name's person : ")
             if person_first != " " and person_first != "":
+                new_person_dict["fist"] = person_first
                 break
             else:
                 print("First name must not empty")
         while True:            
             person_last= input("Enter Last Name's person : ")
             if person_last != " " and person_last != "":
+                new_person_dict["last"] = person_last
                 break
             else:
                 print("Last name must not empty")
-        while True:            
-            person_type= input("Enter type's person : ")
-            if person_type != " " and person_type != "":
-                break
-            else:
-                print("Type must not empty")
-        
+        while True:
+            print("Choose type's person")
+            print("1. admin")
+            print("2. student")
+            print("3. faculty")
+            try:
+                person_type = int(input("Select number for type : "))
+                if person_type != " " and person_type != "" and type(person_type) == int:
+                    if int(person_type) == 1:
+                        new_person_dict["type"] = "admin"
+                    if int(person_type) == 2:
+                        new_person_dict["type"] = "student"
+                    if int(person_type) == 3:
+                        new_person_dict["type"] = "faculty"
+                    break
+                else:
+                    print("Type must not empty")
+            except:
+                pass
 
-  
+        
+        persons_table.add_data_one(field_person,new_person_dict,db)
+        import time
+        data_person = {}
+        for i in persons_table.query_row(db.name):
+            if i["ID"] == str( new_person_dict["ID"]):
+                data_person = i
+                break
+        data = self.change_to_login(data_person)
+        login_table.add_data_one(["person_id", "username", "password", "role"],data ,db)
+        data_login = login_table.get_data_one(str(new_person_dict["ID"]),"person_id",db)
+        print(f"{new_person_dict["fist"]} and {new_person_dict["last"]} already added by ")
+        print(f"username: {data_login["username"]}")
+        print(f"password: {data_login["password"]}")
+
 
         while True:
             print("")
@@ -911,8 +961,6 @@ class ProcessMember:
             if number_choice == "2":
                 self.new_person()
 
-  git config --global user.email "skybluekor@gmail.com"
-  git config --global user.name "KorVee12"
 
     def select_action(self):
         while True:

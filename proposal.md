@@ -44,6 +44,7 @@
 
 # Admin role
 - [X]  `Admin` can view person's information in system.
-- [ ]  `Admin` can add others person to system.
+- [X]  `Admin` can add others person to system.
+- [X]  `Admin` after add person then the data will be in `login.csv` follow the format.
 - [ ]  `Admin` can edit person's information in system.
 - [ ]  `Admin` can delete person in system.
