@@ -43,7 +43,7 @@
 - [X]   If `Faculty` have evaluated then will have notice about do you want edit or not.
 
 # Admin role
-- [ ]  `Admin` can view person's information in system.
+- [X]  `Admin` can view person's information in system.
 - [ ]  `Admin` can add others person to system.
 - [ ]  `Admin` can edit person's information in system.
 - [ ]  `Admin` can delete person in system.

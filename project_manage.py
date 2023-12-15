@@ -186,7 +186,7 @@ def login(username=None, password=None):
 
 initializing()
 # val = login()
-val = login("Hugo.H", "3oz5")  # ! lead
+val = login("Cristiano.C","pwjb")  # ! lead
 # val = login("Karim.K", "cyh0")  # ! member
 # print(val)
 # ! Lionel.L,1i1r,member1
@@ -205,7 +205,7 @@ val = login("Hugo.H", "3oz5")  # ! lead
 # based on the return value for login, activate the code that performs activities according to the role defined for that person_id
 
 if val[1] == "admin":
-    pass
+    ProcessMember(val).select_action()
 elif val[1] == "advisor":
     ProcessMember(val).select_action()
 elif val[1] == "lead":

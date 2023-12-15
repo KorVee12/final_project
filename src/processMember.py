@@ -762,6 +762,79 @@ class ProcessMember:
             elif number_choice == "0":
                 exit()
 
+    def view_all_person(self):
+        data_login_table = login_table.query_row(db.name)
+        count = 1
+        print(f" View all persons ".center(85, "-"))
+        for i in data_login_table:
+            print(f"{count}.".ljust(4," "),end=" ")
+            print(f"person_id: {i["person_id"]}".ljust(22," "),end=" ")
+            print(f"username: {i["username"]}".ljust(22," "),end=" ")
+            print(f"password: {i["password"]}".ljust(19," "),end=" ")
+            print(f"role: {i["role"]}")
+            count += 1
+        print(f" amount of people {len(data_login_table)} ".center(85, "-"))
+        while True:
+            print("")
+            print("1. Back to menu ⬅️")
+            print("0. Exit Program ❌")
+            number_choice = input("Select choice: ")
+            if number_choice == "1":
+                break
+            elif number_choice == "0":
+                exit()
+    
+    def new_person(self):
+        print(f" Add person to member ".center(30, "-"))
+        new_person_dict = {
+            "ID",
+            "fist",
+            "last",
+            "type"
+        }
+        row_person = ["ID",
+            "fist",
+            "last",
+            "type"]
+        while True:            
+            person_id = input("Enter ID's person : ")
+            if len(person_id)== 7:
+                break
+            else:
+                print("ID must equal 7 char")
+        while True:            
+            person_first= input("Enter First Name's person : ")
+            if person_first != " " and person_first != "":
+                break
+            else:
+                print("First name must not empty")
+        while True:            
+            person_last= input("Enter Last Name's person : ")
+            if person_last != " " and person_last != "":
+                break
+            else:
+                print("Last name must not empty")
+        while True:            
+            person_type= input("Enter type's person : ")
+            if person_type != " " and person_type != "":
+                break
+            else:
+                print("Type must not empty")
+        
+
+  
+
+        while True:
+            print("")
+            print("1. Back to menu ⬅️")
+            print("0. Exit Program ❌")
+            number_choice = input("Select choice: ")
+            if number_choice == "1":
+                break
+            elif number_choice == "0":
+                exit()
+
+
     def lead_select_action(self):
         while True:
             if self.__data_member[1] != "lead":
@@ -822,9 +895,29 @@ class ProcessMember:
             if number_choice == "1":
                 self.create_project()
                 self.view_project()
+    
+
+    def admin_select_action(self):
+        while True:
+            print(f"Menu For {self.__data_member[1].capitalize()}".center(30, "-"))
+            print("1. View all person 👁️")
+            print("2. Add new person ➕")
+            print("0. Exit Program ❌")
+            number_choice = input("Select choice: ")
+            if number_choice == "0":
+                exit()
+            if number_choice == "1":
+                self.view_all_person()
+            if number_choice == "2":
+                self.new_person()
+
+  git config --global user.email "skybluekor@gmail.com"
+  git config --global user.name "KorVee12"
 
     def select_action(self):
         while True:
+            if self.__data_member[1] == "admin":
+                self.admin_select_action()
             if self.__data_member[1] == "advisor":
                 self.advisor_select_action()
             if self.__data_member[1] == "lead":
