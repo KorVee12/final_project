@@ -799,7 +799,7 @@ class ProcessMember:
         output_dict["username"] = output_dict.pop("fist")
         output_dict["password"] = output_dict.pop("last")
         output_dict["role"] = output_dict.pop("type")
-        output_dict["username"] = "{}.{}".format(output_dict["username"], output_dict["username"][0])
+        output_dict["username"] = "{}.{}".format(input_dict["fist"], input_dict["last"][0])
         output_dict["password"] = self.random_string(4)
         return output_dict
         
@@ -860,7 +860,6 @@ class ProcessMember:
 
         
         persons_table.add_data_one(field_person,new_person_dict,db)
-        import time
         data_person = {}
         for i in persons_table.query_row(db.name):
             if i["ID"] == str( new_person_dict["ID"]):
@@ -883,7 +882,86 @@ class ProcessMember:
                 break
             elif number_choice == "0":
                 exit()
+    
+    def edit_person(self):
+        data_login_table = login_table.query_row(db.name)
+        data_persons = persons_table.query_row(db.name)
+        count = 0
+        print(f" Edit persons ".center(130, "-"))
+        for i in data_login_table:
+            print(f"{count}.".ljust(4," "),end=" ")
+            print(f"person_id: {i["person_id"]}".ljust(22," "),end=" ")
+            print(f"first name: {data_persons[count]['fist']}".ljust(22," "),end=" ")
+            print(f"last name: {data_persons[count]['last']}".ljust(22," "),end=" ")
+            print(f"username: {i["username"]}".ljust(22," "),end=" ")
+            print(f"password: {i["password"]}".ljust(19," "),end=" ")
+            print(f"role: {i["role"]}")
+            count += 1
+        
+        data_person = {}
 
+        while True:
+            print("")
+            number_choice_person = input("Select number of person: ")
+            if number_choice_person :
+                number_choice_person = int(number_choice_person)
+                data_person =  data_persons[number_choice_person]
+                break
+        
+        while True:            
+            person_first= input(f"Enter new first name's person ({data_person['fist']}) : ")
+            if person_first != " " and person_first != "":
+                data_person["fist"] = person_first
+                break
+            else:
+                print("First name must not empty")
+        while True:            
+            person_last= input(f"Enter new last name's person ({data_person['last']}) : ")
+            if person_last != " " and person_last != "":
+                data_person["last"] = person_last
+                break
+            else:
+                print("Last name must not empty")
+        while True:
+            print("Choose type's person")
+            print("1. admin")
+            print("2. student")
+            print("3. faculty")
+            try:
+                person_type = int(input(f"Select number for type ({data_person["type"]}) : "))
+                if person_type != " " and person_type != "" and type(person_type) == int:
+                    if int(person_type) == 1:
+                        data_person["type"] = "admin"
+                    if int(person_type) == 2:
+                        data_person["type"] = "student"
+                    if int(person_type) == 3:
+                        data_person["type"] = "faculty"
+                    break
+                else:
+                    print("Type must not empty")
+            except:
+                pass
+
+        persons_table.update_row(data_person["ID"],"ID",data_person,["ID","fist","last","type"],db)
+        data_login = login_table.get_data_one(data_person["ID"],"person_id",db)
+        data_login["username"] = "{}.{}".format(data_person["fist"], data_person["last"][0])
+        data_login["password"] = self.random_string(4)
+        login_table.update_row(data_login["person_id"],"person_id",data_login,["person_id","username","password","role"],db)
+        print("Update person success!")
+
+        while True:
+            print("")
+            print("1. Back to menu ⬅️")
+            print("0. Exit Program ❌")
+            number_choice = input("Select choice: ")
+            if number_choice == "1":
+                break
+            elif number_choice == "0":
+                exit()
+
+
+    def delete_person(self):
+        pass
 
     def lead_select_action(self):
         while True:
@@ -952,6 +1030,7 @@ class ProcessMember:
             print(f"Menu For {self.__data_member[1].capitalize()}".center(30, "-"))
             print("1. View all person 👁️")
             print("2. Add new person ➕")
+            print("3. Edit persons 🖋️")
             print("0. Exit Program ❌")
             number_choice = input("Select choice: ")
             if number_choice == "0":
@@ -960,6 +1039,10 @@ class ProcessMember:
                 self.view_all_person()
             if number_choice == "2":
                 self.new_person()
+            if number_choice == "3":
+                self.edit_person()
+            if number_choice == "4":
+                self.delete_person()
 
 
     def select_action(self):
