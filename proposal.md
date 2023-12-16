@@ -46,5 +46,5 @@
 - [X]  `Admin` can view person's information in system.
 - [X]  `Admin` can add others person to system.
 - [X]  `Admin` after add person then the data will be in `login.csv` follow the format.
-- [ ]  `Admin` can edit person's information in system.
-- [ ]  `Admin` can delete person in system.
+- [X]  `Admin` can edit person's data in system then the data will be updated in `login.csv` too. 
+- [X]  `Admin` can delete person in system then the data will be updated in `login.csv` too.
