@@ -171,10 +171,9 @@ def login(username=None, password=None):
 
     for i in users:
         if i["username"] == username and i["password"] == password:
-
             # returns [person_id, role] if valid, otherwise returning None
             return [i["person_id"], i["role"]]
-
+    print("username or password invalid , please recheck again")
     return None
 
 
@@ -185,8 +184,12 @@ def login(username=None, password=None):
 # make calls to the initializing and login functions defined above
 
 initializing()
-# val = login()
-val = login("Cristiano.C","pwjb")  # ! lead
+
+while True:
+    val = login()
+    if val != None:
+        break
+# val = login("Cristiano.C","pwjb")  # ! lead
 # val = login("Karim.K", "cyh0")  # ! member
 # print(val)
 # ! Lionel.L,1i1r,member1
