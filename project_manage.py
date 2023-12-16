@@ -188,18 +188,7 @@ while True:
     val = login()
     if val != None:
         break
-# val = login("Cristiano.C","pwjb")  # ! lead
-# val = login("Karim.K", "cyh0")  # ! member
-# print(val)
-# ! Lionel.L,1i1r,member1
-#! Robert.R,zbx1 member2
-# ! Marco.M,r4yn,advisor
-# ! Arjen.A,dink,advisor
-# ! Toni.T,epgy lead
-# ! Karim.K,cyh0,faculty
-# Henrikh.H,weic
 
-# val = ["4788888", "member"]
 # END part 1
 
 # CONTINUE to part 2 (to be done for the next due date)
