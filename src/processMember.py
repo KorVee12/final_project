@@ -529,7 +529,7 @@ class ProcessMember:
 
     def evaluation_projects(self):
         data = project_table.query_row(db.name)
-        print(" View all projects ".center(30, "-"), end="\n\n")
+        print(" Evaluation project".center(30, "-"), end="\n\n")
         count = 0
         for i in data:
             count += 1
@@ -712,15 +712,19 @@ class ProcessMember:
                 if number_choice == "3":
                     self.evaluation_projects()
             else:
-                print("1. View project's advisor 📃")
+                print("1. View project's advisor 👁️")
                 print("2. View all projects 📃")
+                print("3. Evaluation projects 🖋️")
                 print("0. Exit Program ❌")
+                number_choice = input("Select choice: ")
                 if number_choice == "0":
                     exit()
                 if number_choice == "1":
                     self.view_project()
                 if number_choice == "2":
                     self.view_all_projects()
+                if number_choice == "3":
+                    self.evaluation_projects()
     def get_username(self,person_id):
         data_login = login_table.get_data_one(person_id, "person_id", db)
         return data_login["username"]
