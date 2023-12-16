@@ -889,21 +889,22 @@ class ProcessMember:
     def edit_person(self):
         data_login_table = login_table.query_row(db.name)
         data_persons = persons_table.query_row(db.name)
-        count = 0
-        print(f" Edit persons ".center(130, "-"))
-        for i in data_login_table:
-            print(f"{count}.".ljust(4," "),end=" ")
-            print(f"person_id: {i["person_id"]}".ljust(22," "),end=" ")
-            print(f"first name: {data_persons[count]['fist']}".ljust(22," "),end=" ")
-            print(f"last name: {data_persons[count]['last']}".ljust(22," "),end=" ")
-            print(f"username: {i["username"]}".ljust(22," "),end=" ")
-            print(f"password: {i["password"]}".ljust(19," "),end=" ")
-            print(f"role: {i["role"]}")
-            count += 1
-        
-        data_person = {}
+
 
         while True:
+            count = 0
+            print(f" Edit persons ".center(130, "-"))
+            for i in data_login_table:
+                print(f"{count}.".ljust(4," "),end=" ")
+                print(f"person_id: {i["person_id"]}".ljust(22," "),end=" ")
+                print(f"first name: {data_persons[count]['fist']}".ljust(22," "),end=" ")
+                print(f"last name: {data_persons[count]['last']}".ljust(22," "),end=" ")
+                print(f"username: {i["username"]}".ljust(22," "),end=" ")
+                print(f"password: {i["password"]}".ljust(19," "),end=" ")
+                print(f"role: {i["role"]}")
+                count += 1
+            
+            data_person = {}
             print("")
             number_choice_person = input("Select number of person: ")
             if number_choice_person :
