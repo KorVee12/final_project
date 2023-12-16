@@ -767,11 +767,14 @@ class ProcessMember:
 
     def view_all_person(self):
         data_login_table = login_table.query_row(db.name)
-        count = 1
-        print(f" View all persons ".center(85, "-"))
+        data_persons = persons_table.query_row(db.name)
+        count = 0
+        print(f" Edit persons ".center(130, "-"))
         for i in data_login_table:
             print(f"{count}.".ljust(4," "),end=" ")
             print(f"person_id: {i["person_id"]}".ljust(22," "),end=" ")
+            print(f"first name: {data_persons[count]['fist']}".ljust(22," "),end=" ")
+            print(f"last name: {data_persons[count]['last']}".ljust(22," "),end=" ")
             print(f"username: {i["username"]}".ljust(22," "),end=" ")
             print(f"password: {i["password"]}".ljust(19," "),end=" ")
             print(f"role: {i["role"]}")
@@ -961,7 +964,50 @@ class ProcessMember:
 
 
     def delete_person(self):
-        pass
+        data_login_table = login_table.query_row(db.name)
+        data_persons = persons_table.query_row(db.name)
+        
+            
+        while True:
+            count = 0
+            print(f" Edit persons ".center(130, "-"))
+            for i in data_login_table:
+                print(f"{count}.".ljust(4," "),end=" ")
+                print(f"person_id: {i["person_id"]}".ljust(22," "),end=" ")
+                print(f"first name: {data_persons[count]['fist']}".ljust(22," "),end=" ")
+                print(f"last name: {data_persons[count]['last']}".ljust(22," "),end=" ")
+                print(f"username: {i["username"]}".ljust(22," "),end=" ")
+                print(f"password: {i["password"]}".ljust(19," "),end=" ")
+                print(f"role: {i["role"]}")
+                count += 1
+            print("")
+            number_choice_person = input("Select number for delete : ")
+            if number_choice_person :
+                try:
+                    number_choice_person = int(number_choice_person)
+                    data_person =  data_persons[number_choice_person]
+                    data_login = data_login_table[number_choice_person]
+                    break
+                except:
+                    pass
+        
+        while True:
+            recheck_again = input(f"Are you sure to delete {data_login['username']}? (y/n): ")
+            if recheck_again.lower() == "y":
+                persons_table.delete_row(data_person["ID"],"ID",["ID","fist","last","type"],db)
+                login_table.delete_row(data_login["person_id"],"person_id",["person_id","username","password","role"],db)
+                break
+        print("Delete success!")
+        
+        while True:
+            print("")
+            print("1. Back to menu ⬅️")
+            print("0. Exit Program ❌")
+            number_choice = input("Select choice: ")
+            if number_choice == "1":
+                break
+            elif number_choice == "0":
+                exit()
 
     def lead_select_action(self):
         while True:
@@ -1030,7 +1076,8 @@ class ProcessMember:
             print(f"Menu For {self.__data_member[1].capitalize()}".center(30, "-"))
             print("1. View all person 👁️")
             print("2. Add new person ➕")
-            print("3. Edit persons 🖋️")
+            print("3. Edit person 🖋️")
+            print("4. Delete person 👨")
             print("0. Exit Program ❌")
             number_choice = input("Select choice: ")
             if number_choice == "0":
