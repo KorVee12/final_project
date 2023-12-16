@@ -189,6 +189,7 @@ while True:
     if val != None:
         break
 
+
 # END part 1
 
 # CONTINUE to part 2 (to be done for the next due date)

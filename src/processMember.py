@@ -61,6 +61,9 @@ class ProcessMember:
         """
         data = login_table.query_row(db.name)
         count = 0
+        for x in data:
+            if x["person_id"] == self.__data_member[0]:
+                data.remove(x)
         print(f"Select {name}".center(30, "-"))
         for i in data:
             if i["role"] == "student":
@@ -170,6 +173,7 @@ class ProcessMember:
                         or k == "advisor"
                     ):
                         try:
+
                             v = login_table.get_data_one(v, "person_id", db)["username"]
                         except:
                             v = ""
