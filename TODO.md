@@ -1,214 +1,58 @@
 # Outline
 
-## database.py
-   
-- [X] `get_persons(filename_csv="persons.csv")` 
-  This function use for called `persons.csv` and return list of persons in dictionary. 
+# Project manager
 
-```py
-import csv, os
+# Student Role
+- [X] Make a project.
+- [X] Forward the invitation request message to additional `student`.
+- [X] Forward the message inviting `faculty` to serve as my `advisor`.
+- [x] `student` will take over the job of `lead` after they have completed the assignment.
 
 
-def get_persons(filename_csv="persons.csv"):
-    __location__ = os.path.realpath(
-        os.path.join(os.getcwd(), os.path.dirname(__file__))
-    )
-    persons = []
-    with open(os.path.join(__location__, filename_csv)) as f:
-        rows = csv.DictReader(f)
-        for r in rows:
-            persons.append(dict(r))
-    return persons
-```
+# Member Role
+- [X] Select `yes` or `no` to accept the project invitation from the `lead` project.
+- [X] `member` can read the project's details if they accept the request.
+- [X] if `member` declines the request, `member` will revert to the role of `student` and be able to perform the same tasks as the `student` role.
 
-- [X] `Database` is a class to use for collect the data from `Table` class. 
 
-```py
-class Database:
-    def __init__(self, name_db):
-        self.name = name_db
-        self.tables = []
+# Lead Role
+- [X] `lead` has access to the project's details.
+- [X] The project can be edited by `lead`.
+- [X] Following the editing of `member` by `lead`, if `lead` chooses a new `member` and that new `member` differs from the previous `member`, the previous `member` will revert to the role of `student`.
+- [X] Once the lead has made changes to `advisor`, if they choose a new `advisor` and they are not the same as the previous `advisor`, `advisor` will revert to `faculty`.
+- [X] The project can be deleted by `lead` in the view project's `lead`.
+- [X] `member` will revert to the role of `student` in the event that `lead` deletes the project.
+- [X] `advisor` will revert to `faculty` if `lead` deletes the project.
+- [X] `lead` will revert to the role of `student` if they destroy the project.
+- [X] `lead` has the ability to view each `member`'s {status}. If a `member` has replied, response_date will be displayed; if not, response_date will read `waiting for answer...`.
 
-    def add_table(self, table_object):
-        self.tables.append(table_object)
 
-    def get_tables(self):
-        return self.tables
-```
+# Advisor role
+- [X] Select `yes` or `no` to accept the project invitation from the `lead` project.
+- [X] `advisor` can read the project's details if they approve the request.
+- [X] In the event that `advisor` `reject` the request, `advisor` will revert to `faculty` and `lead`'s role will revert to `student`. Alternatively, they can carry out the same actions as `faculty` and `advisor` will remove that project. 
+- [X] `advisor` has access to every project.
+- [X] `advisor` has access to view their own work.
+- [X] After `advisor` has evaluated a project, `advisor` has to select which project to evaluate.
 
-- [X]  `def __init__(self, name_db)` add two attribute are `name` and `tables`.
+- [X] Project will be included to the table's evaluation project if `advisor` has chosen to `approve` or `reject`.
+- [X] The status of the project will change to `approve` if more than two individuals have been approved by `faculty` or `advisor`.
+- [X] The status of the project will change to `reject` if more than two individuals have been rejected by the faculty or `adviser`.
+- [X] Following evaluation, `advisor` will notify you regarding whether or not you wish to edit.
 
-- [X] `add_table(self, table_object)` this method use to add `table_object` in `tables` list.
 
-- [X] `get_tables(self)` return `tables`
+# Faculty role
+- [X] `faculty` has access to every project.
+- [X]  After `faculty` has evaluated a project, `faculty` has to select which project to evaluate.
+- [X]   Project will be included to the table's evaluation project if `faculty` has chosen to `approve` or `reject`.
+- [X]   The status of the project will change to `approve` if more than two individuals have been approved by `faculty` or `advisor`.
+- [X]   The status of the project will change to `reject` if more than two individuals have been rejected by the `faculty` or `adviser`.
+- [X]   After the evaluation, `faculty` will notify you regarding whether or not you wish to edit.
 
-- [X] `Table` is a class for creating table objects.
-```py
-class Table:
-    def __init__(self, table_name):
-        self.name = table_name
-        self.__list_dict = []
-        self.__fields = []
 
-    def add_fields(self, data: list):
-        self.__fields = data
-
-    def add_row(self, data: list):
-        for row in data:
-            for field in self.__fields:
-                try:
-                    if row[field]:
-                        continue
-                except:
-                    raise Exception(f"Not found field '{field}'")
-
-            self.__list_dict.append(row)
-
-    def get_row(self):
-        return self.__list_dict
-
-    def __repr__(self) -> str:
-        return f"Tables {self.name}"
-```
-- [X] `def __init__(self, table_name)` add three attribute are `name`, `__list_dict` and `__fields`.
-
-- [X] `add_fields(self, data: list)` this method use to add `data` in `__fields` list for create field in table.
-
-- [X] `add_row(self, data: list)` this method use to add `data` in `__list_dict` list for create row in table.
-
-- [X] `get_row(self)` return `__list_dict`
-
-- [X] `def __repr__(self)` return `Tables {self.name}`
-
-# project_manage.py
-
-```py
-from database import Database, Table, get_persons
-import copy
-import random
-import string
-
-db = Database("project_manage")
-buff_seed = 1
-```
-
-- [X] `from database import Database, Table, get_persons` import `Database`, `Table` and `get_persons` from `database` module.
-- [X] `db = Database("project_manage")` create `db` object.
-- [X] `buff_seed = 1` for random seed
-
-### `def initializing()`
-
-- [X] create an object to read an input csv file, persons.csv
-```py
-class Persons:
-        def __init__(self):
-            self.persons = get_persons("persons.csv")
-persons = Persons().persons
-```
-
-- [X] create a 'persons' table
-```py
-persons_table = Table("persons")
-persons_table.add_fields(["ID", "fist", "last", "type"])
-persons_table.add_row(persons)
-```
-
-- [X] add the 'persons' table into the database
-```py
-db.add_table(persons_table)
-```
-
-- [X] create a 'login' table
-```py
-login_table = Table("login")
-```
-
-- [X] the 'login' table has the following keys (attributes)  person_id , username ,password , role this function change the keys from 'ID' to 'person_id' , 'fist' to 'username' , 'last' to 'password' , 'type' to 'role'
-```py
-def change_name_in_dict(input_dict):
-    output_dict = copy.deepcopy(input_dict)
-    for item in output_dict:
-        item["person_id"] = item.pop("ID")
-        item["username"] = item.pop("fist")
-        item["password"] = item.pop("last")
-        item["role"] = item.pop("type")
-
-    return output_dict
-```
-- [X] a person_id is the same as that in the 'persons' table
-```py
-item["person_id"] = item.pop("ID")
-``` 
-
-- [X] let a username be a person's fisrt name followed by a dot and the first letter of that person's last name
-```py
-def change_username_password(login_member):
-    for i in login_member:
-        i["username"] = "{}.{}".format(i["username"], i["username"][0])
-        i["password"] = random_string(4)
-    return login_member
-```
-
-- [X] let a password be a random four digits string
-```py
-def random_string(length):
-    global buff_seed
-    characters = string.ascii_lowercase + string.digits
-    random.seed(6310545302 + buff_seed)
-    buff_seed += 1
-    result = "".join(random.choice(characters) for i in range(length))
-    return result
-```
-
-- [X] let the initial role of all the students be Member and the initial role of all the faculties be faculty
-```py
-def change_role(login_member):
-    for i in login_member:
-
-        # let the initial role of all the faculties be Faculty
-        if i["role"] == "faculty":
-            i["role"] = "faculty"
-    return login_member
-```
-
-- [X] create a login table by performing a series of insert operations; each insert adds a dictionary to a list
-```py
-login_table.add_row(login_member)
-```
-
-- [X] add the 'login' table into the database
-```py
-db.add_table(login_table)
-```
-
-### `def login()`
-
-- [X] ask a user for a username and password
-```py
-while True:
-    username = input("Enter username: ")
-    if username:
-        break
-
-while True:
-    password = input("Enter password: ")
-    if password:
-        break
-```
-
- get data from 'login' table
-```py
-users = db.get_tables()[1].get_row()
-```
-
-- [X] check the username and password have the same in login table returns [person_id, role] if valid, otherwise returning None
-```py
-for i in users:
-    if i["username"] == username and i["password"] == password:
-
-        # returns [person_id, role] if valid, otherwise returning None
-        return [i["person_id"], i["role"]]
-
-return None
-```
-
+# Admin role
+- [X] `admin` has access to the person's data in the system.
+- [X] `admin` Other users can be added to the system by .
+- [X] `admin` After adding a person, the data will be in the format specified in `login.csv`.
+- [X] If a `admin` modifies a person's data in the system, `login.csv` will also receive the updated information. 
+- [X] If an individual is deleted from the system, the information in `login.csv` will also be changed.
