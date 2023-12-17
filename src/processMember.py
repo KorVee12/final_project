@@ -107,8 +107,12 @@ class ProcessMember:
 
     def send_request(self, role_name, data_user):
         if role_name == "member":
+            try:
+                project_id = self.project_id 
+            except:
+                project_id = project_table.get_data_one(self.__data_member[0],"lead",db)["project_id"]
             data = {
-                "project_id": self.project_id,
+                "project_id": project_id,
                 "to_be_member": data_user["person_id"],
                 "response": None,
                 "response_date": None,
@@ -118,8 +122,12 @@ class ProcessMember:
                 ["project_id", "to_be_member", "response", "response_date"], data, db
             )
         elif role_name == "advisor":
+            try:
+                project_id = self.project_id 
+            except:
+                project_id = project_table.get_data_one(self.__data_member[0],"lead",db)["project_id"]
             data = {
-                "project_id": self.project_id,
+                "project_id": project_id,
                 "to_be_advisor": data_user["person_id"],
                 "response": None,
                 "response_date": None,
@@ -181,7 +189,7 @@ class ProcessMember:
                         if v == "pendding":
                             v = "Pendding..."
                         elif v == "approve":
-                            v = "Accept"
+                            v = "Approve"
 
                     print(f"{k} : {v}")
         while show_toolbar:
@@ -264,7 +272,17 @@ class ProcessMember:
                     ],
                     db_object=db,
                 )
-            break
+                for x in evaluation_project_table.query_row(db.name):
+                    if i["project_id"] == x["project_id"]:
+                        evaluation_project_table.delete_row(
+                            id=i["project_id"],
+                            field_id="project_id",
+                            fieldname=['project_id','teacher_id','evaluation_status','evaluation_date'],
+                            db_object=db,
+                        )
+                        break
+                break
+
         self.view_project()
 
     def delete_project(self):
@@ -475,6 +493,33 @@ class ProcessMember:
                         ],
                         db_object=db,
                     )
+                    member = project_table.get_data_one(
+                        id=advisor_pending["project_id"],
+                        field_id="project_id",
+                        db_object=db
+                    )
+                    member_pending_request_table.delete_row(
+                        id=member["member1"],
+                        field_id="to_be_member",
+                        fieldname=[
+                            "project_id",
+                            "to_be_member",
+                            "response",
+                            "response_date",
+                        ],
+                        db_object=db
+                    )
+                    member_pending_request_table.delete_row(
+                        id=member["member2"],
+                        field_id="to_be_member",
+                        fieldname=[
+                            "project_id",
+                            "to_be_member",
+                            "response",
+                            "response_date",
+                        ],
+                        db_object=db
+                    )
                     project_table.delete_row(
                         id=advisor_pending["project_id"],
                         field_id="project_id",
@@ -492,7 +537,19 @@ class ProcessMember:
                     data = login_table.get_data_one(
                         self.__data_member[0], "person_id", db
                     )
+                    data_member_1 = login_table.get_data_one(
+                        member["member1"], "person_id", db
+                    )
+                    data_member_2 = login_table.get_data_one(
+                        member["member2"], "person_id", db
+                    )
+                    data_lead = login_table.get_data_one(
+                        member["lead"], "person_id", db
+                    )
                     self.change_role("faculty", data)
+                    self.change_role("student", data_member_1)
+                    self.change_role("student", data_member_2)
+                    self.change_role("student", data_lead)
                     self.__data_member[-1] = "faculty"
                     print("Your project has been declided.")
                 break
@@ -675,56 +732,7 @@ class ProcessMember:
 
             break
 
-    def faculty_select_action(self):
-        while True:
-            if self.__data_member[1] != "faculty":
-                break
-            print(f"Menu For {self.__data_member[1].capitalize()}".center(30, "-"))
-            print("1. View all projects 📃")
-            print("2. Evaluation projects 🖋️")
-            print("0. Exit Program ❌")
-            number_choice = input("Select choice: ")
-            if number_choice == "0":
-                exit()
-            if number_choice == "1":
-                self.view_all_projects()
-            if number_choice == "2":
-                self.evaluation_projects()
-
-    def advisor_select_action(self):
-        while True:
-            if self.__data_member[1] != "advisor":
-                break
-            print(f"Menu For {self.__data_member[1].capitalize()}".center(30, "-"))
-            requested = self.check_request_project()
-            if requested:
-                print("1. View request project 👁️")
-                print("2. View all projects 📃")
-                print("3. Evaluation projects 🖋️")
-                print("0. Exit Program ❌")
-                number_choice = input("Select choice: ")
-                if number_choice == "0":
-                    break
-                if number_choice == "1":
-                    self.response_request_project()
-                if number_choice == "2":
-                    self.view_all_projects()
-                if number_choice == "3":
-                    self.evaluation_projects()
-            else:
-                print("1. View project's advisor 👁️")
-                print("2. View all projects 📃")
-                print("3. Evaluation projects 🖋️")
-                print("0. Exit Program ❌")
-                number_choice = input("Select choice: ")
-                if number_choice == "0":
-                    exit()
-                if number_choice == "1":
-                    self.view_project()
-                if number_choice == "2":
-                    self.view_all_projects()
-                if number_choice == "3":
-                    self.evaluation_projects()
+    
     def get_username(self,person_id):
         data_login = login_table.get_data_one(person_id, "person_id", db)
         return data_login["username"]
@@ -780,12 +788,12 @@ class ProcessMember:
         print(f" Edit persons ".center(130, "-"))
         for i in data_login_table:
             print(f"{count}.".ljust(4," "),end=" ")
-            print(f"person_id: {i["person_id"]}".ljust(22," "),end=" ")
+            print(f"person_id: {i['person_id']}".ljust(22," "),end=" ")
             print(f"first name: {data_persons[count]['fist']}".ljust(22," "),end=" ")
             print(f"last name: {data_persons[count]['last']}".ljust(22," "),end=" ")
-            print(f"username: {i["username"]}".ljust(22," "),end=" ")
-            print(f"password: {i["password"]}".ljust(19," "),end=" ")
-            print(f"role: {i["role"]}")
+            print(f"username: {i['username']}".ljust(22," "),end=" ")
+            print(f"password: {i['password']}".ljust(19," "),end=" ")
+            print(f"role: {i['role']}")
             count += 1
         print(f" amount of people {len(data_login_table)} ".center(85, "-"))
         while True:
@@ -879,9 +887,9 @@ class ProcessMember:
         data = self.change_to_login(data_person)
         login_table.add_data_one(["person_id", "username", "password", "role"],data ,db)
         data_login = login_table.get_data_one(str(new_person_dict["ID"]),"person_id",db)
-        print(f"{new_person_dict["fist"]} and {new_person_dict["last"]} already added by ")
-        print(f"username: {data_login["username"]}")
-        print(f"password: {data_login["password"]}")
+        print(f"{new_person_dict['fist']} and {new_person_dict['last']} already added by ")
+        print(f"username: {data_login['username']}")
+        print(f"password: {data_login['password']}")
 
 
         while True:
@@ -904,12 +912,12 @@ class ProcessMember:
             print(f" Edit persons ".center(130, "-"))
             for i in data_login_table:
                 print(f"{count}.".ljust(4," "),end=" ")
-                print(f"person_id: {i["person_id"]}".ljust(22," "),end=" ")
+                print(f"person_id: {i['person_id']}".ljust(22," "),end=" ")
                 print(f"first name: {data_persons[count]['fist']}".ljust(22," "),end=" ")
                 print(f"last name: {data_persons[count]['last']}".ljust(22," "),end=" ")
-                print(f"username: {i["username"]}".ljust(22," "),end=" ")
-                print(f"password: {i["password"]}".ljust(19," "),end=" ")
-                print(f"role: {i["role"]}")
+                print(f"username: {i['username']}".ljust(22," "),end=" ")
+                print(f"password: {i['password']}".ljust(19," "),end=" ")
+                print(f"role: {i['role']}")
                 count += 1
             
             data_person = {}
@@ -940,7 +948,7 @@ class ProcessMember:
             print("2. student")
             print("3. faculty")
             try:
-                person_type = int(input(f"Select number for type ({data_person["type"]}) : "))
+                person_type = int(input(f"Select number for type ({data_person['type']}) : "))
                 if person_type != " " and person_type != "" and type(person_type) == int:
                     if int(person_type) == 1:
                         data_person["type"] = "admin"
@@ -982,12 +990,12 @@ class ProcessMember:
             print(f" Edit persons ".center(130, "-"))
             for i in data_login_table:
                 print(f"{count}.".ljust(4," "),end=" ")
-                print(f"person_id: {i["person_id"]}".ljust(22," "),end=" ")
+                print(f"person_id: {i['person_id']}".ljust(22," "),end=" ")
                 print(f"first name: {data_persons[count]['fist']}".ljust(22," "),end=" ")
                 print(f"last name: {data_persons[count]['last']}".ljust(22," "),end=" ")
-                print(f"username: {i["username"]}".ljust(22," "),end=" ")
-                print(f"password: {i["password"]}".ljust(19," "),end=" ")
-                print(f"role: {i["role"]}")
+                print(f"username: {i['username']}".ljust(22," "),end=" ")
+                print(f"password: {i['password']}".ljust(19," "),end=" ")
+                print(f"role: {i['role']}")
                 count += 1
             print("")
             number_choice_person = input("Select number for delete : ")
@@ -1017,7 +1025,50 @@ class ProcessMember:
                 break
             elif number_choice == "0":
                 exit()
+    def faculty_select_action(self):
+        while True:
+            if self.__data_member[1] != "faculty":
+                break
+            print(f"Menu For {self.__data_member[1].capitalize()}".center(30, "-"))
+            print("1. View all projects 📃")
+            print("2. Evaluation projects 🖋️")
+            print("0. Exit Program ❌")
+            number_choice = input("Select choice: ")
+            if number_choice == "0":
+                exit()
+            if number_choice == "1":
+                self.view_all_projects()
+            if number_choice == "2":
+                self.evaluation_projects()
 
+    def advisor_select_action(self):
+        while True:
+            if self.__data_member[1] != "advisor":
+                break
+            print(f"Menu For {self.__data_member[1].capitalize()}".center(30, "-"))
+            requested = self.check_request_project()
+            if requested:
+                print("1. View request project 👁️")
+                print("0. Exit Program ❌")
+                number_choice = input("Select choice: ")
+                if number_choice == "0":
+                    break
+                if number_choice == "1":
+                    self.response_request_project()
+            else:
+                print("1. View project's advisor 👁️")
+                print("2. View all projects 📃")
+                print("3. Evaluation projects 🖋️")
+                print("0. Exit Program ❌")
+                number_choice = input("Select choice: ")
+                if number_choice == "0":
+                    exit()
+                if number_choice == "1":
+                    self.view_project()
+                if number_choice == "2":
+                    self.view_all_projects()
+                if number_choice == "3":
+                    self.evaluation_projects()
     def lead_select_action(self):
         while True:
             if self.__data_member[1] != "lead":
@@ -1034,7 +1085,11 @@ class ProcessMember:
             if number_choice == "1":
                 self.view_project()
             if number_choice == "2":
-                self.edit_project()
+                if project_table.get_data_one(self.__data_member[0], "lead", db)["status"] != "approve":
+                    self.edit_project()
+                    print("Edit success!")
+                else:
+                    print("Project already approve!")
             if number_choice == "3":
                 self.view_member()
             if number_choice == "4":

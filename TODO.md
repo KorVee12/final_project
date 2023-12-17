@@ -43,11 +43,11 @@
 
 # Faculty role
 - [X] `faculty` has access to every project.
-- [X]  After `faculty` has evaluated a project, `faculty` has to select which project to evaluate.
-- [X]   Project will be included to the table's evaluation project if `faculty` has chosen to `approve` or `reject`.
-- [X]   The status of the project will change to `approve` if more than two individuals have been approved by `faculty` or `advisor`.
-- [X]   The status of the project will change to `reject` if more than two individuals have been rejected by the `faculty` or `adviser`.
-- [X]   After the evaluation, `faculty` will notify you regarding whether or not you wish to edit.
+- [X] After `faculty` has evaluated a project, `faculty` has to select which project to evaluate.
+- [X] Project will be included to the table's evaluation project if `faculty` has chosen to `approve` or `reject`.
+- [X] The status of the project will change to `approve` if more than two individuals have been approved by `faculty` or `advisor`.
+- [X] The status of the project will change to `reject` if more than two individuals have been rejected by the `faculty` or `adviser`.
+- [X] After the evaluation, `faculty` will notify you regarding whether or not you wish to edit.
 
 
 # Admin role
