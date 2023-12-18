@@ -58,6 +58,18 @@
 
 </div>
 
+## Role
+
+```mermaid
+graph TD
+    A[Project Manage] --> B[Admin]
+    A --> C[Student]
+    A --> D[Member]
+    A --> E[Lead]
+    A --> F[Advisor]
+    A --> G[Faculty]
+```
+
 ## How to run my project?
 - First, you have to see `username` and `password` in `login.csv` file.
 - Second, you have to login as `student` with `username` and `password`.
