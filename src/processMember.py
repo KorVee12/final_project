@@ -24,6 +24,13 @@ class ProcessMember:
         self.__data_member = val
 
     def check_request_project(self) -> bool:
+        """
+        The function `check_request_project` checks if a member or advisor has a pending request to join
+        a project.
+        
+        Returns:
+          a boolean value. If the condition is met, it returns True. Otherwise, it returns False.
+        """
         if self.__data_member[-1] == "member":
             member_pending = member_pending_request_table.get_data_one(
                 self.__data_member[0], "to_be_member", db
@@ -54,11 +61,6 @@ class ProcessMember:
         )
 
     def invite_member(self, name) -> str:
-        """
-        The function `invite_member` selects a member from a login table based on their role being
-        "student" and returns their username.
-        :return: a string, which is the username of the selected member 1.
-        """
         data = login_table.query_row(db.name)
         count = 0
         for x in data:
